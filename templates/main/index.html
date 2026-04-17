@@ -300,6 +300,8 @@
                 <div class="trip-image">
                     {% if trip.image %}
                         <img src="{{ trip.image.url }}" alt="{{ trip.destination }}">
+                    {% elif trip.image_url %}
+                        <img src="{{ trip.image_url }}" alt="{{ trip.destination }}">
                     {% else %}
                         <img src="https://images.unsplash.com/photo-1548013146-72479768bbaa?w=800" alt="Destination">
                     {% endif %}
@@ -369,17 +371,23 @@
         </div>
         <div class="services-grid">
             <div class="service-card reveal">
-                <i class="fas fa-hotel"></i>
+                <div style="height: 120px; border-radius: 1rem; overflow: hidden; margin-bottom: 1.5rem;">
+                    <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
                 <h3>Luxury Stays</h3>
                 <p style="color: var(--text-muted);">We handpick every partner hotel to ensure the highest standards of luxury and safety.</p>
             </div>
             <div class="service-card reveal">
-                <i class="fas fa-shuttle-van"></i>
+                <div style="height: 120px; border-radius: 1rem; overflow: hidden; margin-bottom: 1.5rem;">
+                    <img src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=500" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
                 <h3>Seamless Transport</h3>
                 <p style="color: var(--text-muted);">Reliable, professional transport options tailored to your group's size and comfort.</p>
             </div>
             <div class="service-card reveal">
-                <i class="fas fa-map-marked-alt"></i>
+                <div style="height: 120px; border-radius: 1rem; overflow: hidden; margin-bottom: 1.5rem;">
+                    <img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=500" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
                 <h3>Expert Guides</h3>
                 <p style="color: var(--text-muted);">Local experts who bring history and culture to life with stories you won't find in books.</p>
             </div>

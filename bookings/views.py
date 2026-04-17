@@ -143,5 +143,8 @@ def initiate_payment_api(request):
                 'amount': amount_in_paise
             })
         except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+            error_msg = str(e)
+            if "key_id" in error_msg.lower() or not settings.RAZORPAY_KEY_ID:
+                error_msg = "Razorpay Keys are missing in Environment Variables. Please set RAZORPAY_KEY_ID."
+            return JsonResponse({'status': 'error', 'message': error_msg}, status=500)
     return JsonResponse({'status': 'error'}, status=400)

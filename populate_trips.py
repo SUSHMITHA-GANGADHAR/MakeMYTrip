@@ -16,7 +16,7 @@ def populate():
             "price": 22000,
             "total_seats": 50,
             "available_seats": 35,
-            "image_url": "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80",
+            "image_url": "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=1000",
             "hotels": ["Taj Madurai", "Heritage Madurai"],
             "nearby": "Meenakshi Amman Temple, Thirumalai Nayakkar Mahal"
         },
@@ -27,7 +27,7 @@ def populate():
             "price": 15000,
             "total_seats": 30,
             "available_seats": 20,
-            "image_url": "https://images.unsplash.com/photo-1561359313-0639aad49ca6?auto=format&fit=crop&w=800&q=80",
+            "image_url": "https://images.unsplash.com/photo-1561359313-0639aad49ca6?w=1000",
             "hotels": ["Brijrama Palace", "Taj Ganges"],
             "nearby": "Kashi Vishwanath Temple, Dashashwamedh Ghat"
         },
@@ -38,7 +38,7 @@ def populate():
             "price": 45000,
             "total_seats": 20,
             "available_seats": 12,
-            "image_url": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80",
+            "image_url": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1000",
             "hotels": ["The Ritz Paris", "Hotel Plaza Athenee"],
             "nearby": "Eiffel Tower, Louvre Museum"
         },
@@ -49,7 +49,7 @@ def populate():
             "price": 9500,
             "total_seats": 100,
             "available_seats": 85,
-            "image_url": "https://images.unsplash.com/photo-1512783563744-1921f6690460?auto=format&fit=crop&w=800&q=80",
+            "image_url": "https://images.unsplash.com/photo-1512314889357-e157c22f938d?w=1000",
             "hotels": ["Taj Exotica Goa", "W Goa"],
             "nearby": "Baga Beach, Calangute Beach"
         },
@@ -60,7 +60,7 @@ def populate():
             "price": 12000,
             "total_seats": 100,
             "available_seats": 60,
-            "image_url": "https://images.unsplash.com/photo-1514222139-b576bb5ce007?auto=format&fit=crop&w=800&q=80",
+            "image_url": "https://images.unsplash.com/photo-1514222139-b576bb5ce007?w=1000",
             "hotels": ["Hyatt Regency Amritsar"],
             "nearby": "Golden Temple, Jallianwala Bagh"
         },
@@ -71,7 +71,7 @@ def populate():
             "price": 16000,
             "total_seats": 25,
             "available_seats": 15,
-            "image_url": "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?auto=format&fit=crop&w=800&q=80",
+            "image_url": "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=1000",
             "hotels": ["Evolve Back Kamlapura Palace"],
             "nearby": "Virupaksha Temple, Vittala Temple"
         },
@@ -82,7 +82,7 @@ def populate():
             "price": 14000,
             "total_seats": 30,
             "available_seats": 30,
-            "image_url": "https://images.unsplash.com/photo-1505342412152-3201405b0854?auto=format&fit=crop&w=800&q=80",
+            "image_url": "https://images.unsplash.com/photo-1590050752117-23a9d7f6e39e?w=1000",
             "hotels": ["Mayfair Heritage Puri"],
             "nearby": "Konark Sun Temple, Chandrabhaga Beach"
         },
@@ -93,7 +93,7 @@ def populate():
             "price": 17500,
             "total_seats": 35,
             "available_seats": 25,
-            "image_url": "https://images.unsplash.com/photo-1544735745-b89b57c61dfd?auto=format&fit=crop&w=800&q=80",
+            "image_url": "https://images.unsplash.com/photo-1620050893084-250fb1687d97?w=1000",
             "hotels": ["Taj Rishikesh Resort"],
             "nearby": "Laxman Jhula, Ram Jhula"
         }

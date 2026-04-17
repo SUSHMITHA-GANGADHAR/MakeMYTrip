@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}My Bookings | MakeMyTrip{% endblock %}
+
+{% block content %}
+<div class="container" style="margin: 6rem auto; max-width: 1000px;">
+    <h1 style="margin-bottom: 3rem; font-size: 3rem; font-weight: 950; text-shadow: 0 4px 15px rgba(0,0,0,0.5);">My Bookings</h1>
+
+    {% for booking in bookings %}
+    <div class="glass-card" style="padding: 2.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 0.8rem;">
+                <h3 style="margin: 0; font-size: 1.8rem; font-weight: 900;">{{ booking.trip.destination }}</h3>
+                <span style="padding: 0.4rem 1.2rem; border-radius: 99px; font-size: 0.8rem; font-weight: 900; background: {% if booking.status == 'confirmed' %}rgba(52, 211, 153, 0.2){% elif booking.status == 'payment_confirmed' or booking.status == 'pending_admin' %}rgba(251, 191, 36, 0.2){% else %}rgba(244, 63, 94, 0.2){% endif %}; color: {% if booking.status == 'confirmed' %}#34d399{% elif booking.status == 'payment_confirmed' or booking.status == 'pending_admin' %}#fbbf24{% else %}#fb7185{% endif %}; border: 1px solid rgba(255,255,255,0.1);">
+                    {{ booking.status|upper }}
+                </span>
+            </div>
+            <p style="color: rgba(255,255,255,0.7); font-size: 1rem; font-weight: 700;">
+                Booked on {{ booking.created_at|date:"M d, Y" }} &bull; {{ booking.seats_booked }} No of Seats
+            </p>
+        </div>
+        
+        <div style="text-align: right;">
+            <div style="font-size: 1.6rem; font-weight: 950; color: var(--primary); margin-bottom: 1.2rem;">₹{{ booking.total_price }}</div>
+            {% if booking.status != 'cancelled' and booking.status != 'rejected' %}
+                <a href="{% url 'bookings:cancel_booking' booking.id %}" class="btn btn-outline" style="font-size: 0.85rem; padding: 0.6rem 2rem; color: var(--accent); border-color: rgba(244, 63, 94, 0.4);" onclick="return confirm('Initiate cancellation? This will follow the deduction policy.')">CANCEL</a>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <div class="glass-card" style="padding: 4rem; text-align: center; color: var(--text-muted);">
+        <i class="fas fa-ticket-alt fa-3x" style="margin-bottom: 1.5rem; opacity: 0.2;"></i>
+        <p>You haven't made any bookings yet.</p>
+        <a href="{% url 'trips:trip_list' %}" class="btn btn-primary" style="margin-top: 1.5rem;">Start Exploring</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

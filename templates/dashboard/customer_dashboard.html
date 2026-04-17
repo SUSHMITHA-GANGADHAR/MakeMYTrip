@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --glass: rgba(255, 255, 255, 0.08);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+    
+    .dashboard-wrapper { display: flex; min-height: calc(100vh - 7rem); }
+    
+    /* Sidebar */
+    .sidebar {
+        width: 300px; background: rgba(0, 0, 0, 0.2);
+        border-right: 1px solid var(--glass-border);
+        padding: 2rem; flex-shrink: 0;
+        display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .side-item {
+        padding: 1.2rem 1.5rem; border-radius: 1rem;
+        color: rgba(255,255,255,0.7); text-decoration: none;
+        display: flex; align-items: center; gap: 1rem;
+        transition: 0.3s;
+        font-weight: 800; font-size: 1rem; 
+        cursor: pointer;
+    }
+    .side-item:hover, .side-item.active {
+        background: var(--primary); color: #020617;
+    }
+
+    /* Section Content */
+    .section-content { display: none; width: 100%; animation: fadeIn 0.4s ease-out; }
+    .section-content.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Search Bar */
+    .search-box {
+        background: rgba(255,255,255,0.05); border: 2px solid var(--glass-border);
+        padding: 1.2rem 2rem; border-radius: 5rem;
+        width: 100%; max-width: 600px;
+        color: white; font-size: 1.1rem; font-weight: 700;
+        outline: none; margin-bottom: 3rem;
+        backdrop-filter: blur(10px);
+    }
+
+    /* Massive Grid and Cards */
+    .grid-container {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 2.5rem; margin-top: 1rem;
+    }
+
+    .h-massive { font-size: 3.5rem; font-weight: 950; margin-bottom: 0.5rem; }
+    .p-large { font-size: 1.1rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 2rem; }
+    
+    .price-tag {
+        position: absolute; top: 1.2rem; right: 1.2rem;
+        background: var(--primary); padding: 0.4rem 1rem;
+        border-radius: 999px; color: #020617;
+        font-weight: 900; font-size: 1rem;
+    }
+
+    /* Ticket Style Booking */
+    .ticket-card {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 2rem;
+        overflow: hidden;
+        display: flex;
+        transition: 0.3s;
+        min-height: 200px;
+    }
+    .ticket-card:hover { transform: scale(1.02); border-color: var(--primary); }
+    .ticket-left {
+        width: 15px; background: var(--primary);
+        position: relative;
+    }
+    .ticket-left::after {
+        content: ''; position: absolute; top: 50%; left: 50%;
+        width: 20px; height: 20px; background: #050f1e;
+        border-radius: 50%; transform: translate(-50%, -50%);
+    }
+    .ticket-main { flex: 1; padding: 2rem; }
+
+    /* Offer Cards - Refined White Glass */
+    .offer-card {
+        min-width: 320px; padding: 2.5rem; border-radius: 2rem;
+        background: rgba(255, 255, 255, 0.18);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(30px);
+        transition: 0.3s;
+    }
+    .offer-card:hover { transform: translateY(-5px) scale(1.02); background: rgba(255,255,255,0.22); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <aside class="sidebar">
+        <h2 style="font-size: 1.4rem; font-weight: 950; margin-bottom: 2rem; text-transform: uppercase; padding-left: 1rem; letter-spacing: 2px;">Portal</h2>
+        <div class="side-item active" onclick="showSection('dashboard', this)"><i class="fas fa-th-large"></i> Dashboard</div>
+        <div class="side-item" onclick="showSection('bookings', this)"><i class="fas fa-ticket-alt"></i> My Bookings</div>
+        <div class="side-item" onclick="showSection('history', this)"><i class="fas fa-history"></i> History</div>
+        <div class="side-item" onclick="showSection('tracking', this)"><i class="fas fa-map-marked-alt"></i> Tracking</div>
+    </aside>
+
+    <main style="flex: 1; padding: 3rem 4rem; position: relative; z-index: 1; margin-top: 0;">
+        <div style="margin-bottom: 3rem;">
+            <h1 class="h-massive" id="section-title">Hello, {{ user.name }}</h1>
+            <p class="p-large" id="section-subtitle">Your personalized travel headquarters.</p>
+            <div style="position: relative; max-width: 700px;">
+                <i class="fas fa-search" style="position: absolute; left: 1.5rem; top: 50%; transform: translateY(-50%); color: var(--primary);"></i>
+                <input type="text" class="search-box" id="searchInput" placeholder="Search your next destination..." onkeyup="filterTrips()" style="padding-left: 3.5rem;">
+            </div>
+        </div>
+
+        <div id="section-dashboard" class="section-content active">
+            <div class="grid-container" id="tripsGrid">
+                {% for trip in available_trips %}
+                <div class="glass-card trip-card" data-title="{{ trip.destination|lower }}" style="display: flex; flex-direction: column; min-height: 480px;">
+                    <div style="height: 220px; position: relative; flex-shrink: 0;">
+                        <img src="{% if trip.image %}{{ trip.image.url }}{% elif trip.image_url %}{{ trip.image_url }}{% else %}https://images.unsplash.com/photo-1548013146-72479768bbaa?w=800{% endif %}" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div class="price-tag">₹{{ trip.price }}</div>
+                    </div>
+                    <div style="padding: 2rem; flex: 1; display: flex; flex-direction: column;">
+                        <div style="display: flex; gap: 1.2rem; margin-bottom: 0.8rem; font-size: 0.85rem; font-weight: 800; color: var(--primary);">
+                            <span><i class="far fa-clock"></i> {{ trip.duration }}</span>
+                            <span><i class="fas fa-users"></i> {{ trip.available_seats }} No of Seats</span>
+                        </div>
+                        <div style="flex: 1;">
+                            <h3 style="font-size: 1.6rem; font-weight: 900; margin-bottom: 1rem; color: white;">{{ trip.destination }}</h3>
+                            <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 2rem; line-height: 1.5;">
+                                {{ trip.description|truncatewords:15 }}
+                            </p>
+                        </div>
+                        <a href="{% url 'trips:trip_detail' trip.pk %}" class="btn btn-primary" style="width: 100%; text-align: center; padding: 1.1rem; font-weight: 950; border-radius: 99px; letter-spacing: 1px;">BOOK JOURNEY</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="section-bookings" class="section-content">
+            <div style="display: grid; grid-template-columns: 1fr; gap: 2rem; max-width: 900px;">
+                {% for booking in active_bookings %}
+                <div class="ticket-card">
+                    <div class="ticket-left"></div>
+                    <div class="ticket-main">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div>
+                                <p style="font-size: 0.7rem; font-weight: 900; color: var(--primary); letter-spacing: 1px;">BOOKING ID: #{{ booking.id }}</p>
+                                <h3 style="font-size: 2.2rem; font-weight: 950; margin: 0.5rem 0;">{{ booking.trip.destination }}</h3>
+                                <p style="font-weight: 800; color: rgba(255,255,255,0.6);"><i class="far fa-calendar-alt"></i> Reserved for: {{ booking.trip.start_date|date:"D, d M Y" }}</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <span style="background: rgba(251, 191, 36, 0.1); color: #fbbf24; padding: 0.5rem 1.2rem; border-radius: 99px; font-weight: 900; font-size: 0.8rem;">
+                                    {{ booking.get_status_display|upper }}
+                                </span>
+                                <p style="font-size: 1.4rem; font-weight: 950; color: white; margin-top: 1rem;">₹{{ booking.total_price }}</p>
+                                <p style="font-size: 0.7rem; font-weight: 700;">{{ booking.seats_booked }} ADULTS</p>
+                            </div>
+                        </div>
+                        <div style="margin-top: 2rem; display: flex; gap: 2rem; align-items: center; border-top: 1px dashed rgba(255,255,255,0.1); pt: 1.5rem;">
+                            <div style="font-weight: 800; font-size: 0.85rem;">
+                                <i class="fas fa-shield-alt" style="color: #34d399;"></i> Secured with SSL Payment
+                            </div>
+                            {% if booking.status == 'pending_admin' or booking.status == 'confirmed' %}
+                            <form action="{% url 'bookings:cancel_booking' booking.id %}" method="POST" style="margin-left: auto;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline" style="border-color: #fb7185; color: #fb7185; font-size: 0.7rem; padding: 0.6rem 1.5rem;">TERMINATE RESERVATION</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="p-large">You have no active horizons. Time to book a new journey!</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="section-history" class="section-content">
+            <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; max-width: 900px;">
+                {% for booking in history_bookings %}
+                <div class="ticket-card" style="min-height: 120px; border-color: rgba(255,255,255,0.15);">
+                    <div class="ticket-left" style="background: #64748b;"></div>
+                    <div class="ticket-main" style="padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h4 style="font-size: 1.3rem; font-weight: 800; color: white; margin: 0;">{{ booking.trip.destination }}</h4>
+                            <p style="font-size: 0.75rem; color: rgba(255,255,255,0.8); margin-top: 0.3rem; font-weight: 700;">ARCHIVED JOURNEY • {{ booking.created_at|date:"M d, Y" }}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="font-size: 0.7rem; font-weight: 950; color: {% if booking.status == 'confirmed' %}#34d399{% else %}#ff8e9e{% endif %}; border: 1px solid rgba(255,255,255,0.2); padding: 0.3rem 0.8rem; border-radius: 99px; background: rgba(255,255,255,0.05);">
+                                {% if booking.status == 'confirmed' %}COMPLETED{% else %}{{ booking.get_status_display|upper }}{% endif %}
+                            </span>
+                            {% if booking.refund_amount > 0 %}
+                            <p style="font-size: 0.8rem; font-weight: 900; color: #34d399; margin-top: 0.5rem; text-shadow: 0 0 10px rgba(52, 211, 153, 0.3);">REFUNDED: ₹{{ booking.refund_amount }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="p-large">Your travel log is empty. Every Great journey begins with a first step.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="section-tracking" class="section-content">
+            <div class="glass-card" style="padding: 4rem; text-align: center;">
+                <i class="fas fa-map-marked-alt fa-3x" style="color: var(--primary); margin-bottom: 1.5rem;"></i>
+                <h3 style="font-size: 2rem; font-weight: 950; color: white;">GPS Tracking</h3>
+                <p class="p-large">Real-time sync starts 24 hours before your journey.</p>
+            </div>
+        </div>
+
+        <!-- MMT Offers Section -->
+        <div style="margin-top: 6rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 style="font-size: 2rem; font-weight: 950;">Exclusive Offers</h2>
+                <p style="color: var(--primary); font-weight: 800; cursor: pointer;" onclick="toggleMoreOffers()">VIEW ALL <i class="fas fa-arrow-right"></i></p>
+            </div>
+            <div style="display: flex; gap: 2rem; overflow-x: auto; padding-bottom: 2rem; scrollbar-width: none;">
+                <div class="offer-card">
+                    <p style="font-size: 0.65rem; font-weight: 900; color: #fbbf24;">LIMITED TIME</p>
+                    <h4 style="font-size: 1.4rem; margin: 0.5rem 0; font-weight: 950;">Grab Up to 40% OFF*</h4>
+                    <p style="font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 1.5rem;">On Hotels, Flights, and Holiday Packages.</p>
+                    <p style="font-weight: 950; color: var(--primary); cursor: pointer; letter-spacing: 1px;" onclick="showSection('dashboard', document.querySelector('.side-item'))">BOOK NOW</p>
+                </div>
+                <!-- ... other cards similarly ... -->
+                <div class="offer-card">
+                    <p style="font-size: 0.65rem; font-weight: 900; color: #fbbf24;">SPECIAL PRICE</p>
+                    <h4 style="font-size: 1.4rem; margin: 0.5rem 0; font-weight: 950;">Flat 8% OFF* on Buses</h4>
+                    <p style="font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 1.5rem;">From Kolkata, Bihar & more</p>
+                    <p style="font-weight: 950; color: var(--primary); cursor: pointer; letter-spacing: 1px;" onclick="showSection('dashboard', document.querySelector('.side-item'))">BOOK NOW</p>
+                </div>
+                <div class="offer-card">
+                    <p style="font-size: 0.65rem; font-weight: 900; color: #fbbf24;">CHAR DHAM</p>
+                    <h4 style="font-size: 1.4rem; margin: 0.5rem 0; font-weight: 950;">Up to 30% OFF</h4>
+                    <p style="font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 1.5rem;">On stays and complete packages.</p>
+                    <p style="font-weight: 950; color: var(--primary); cursor: pointer; letter-spacing: 1px;" onclick="showSection('dashboard', document.querySelector('.side-item'))">BOOK NOW</p>
+                </div>
+
+                <!-- Extra hidden offers -->
+                <div id="extra-offers" style="display: none; gap: 2rem;">
+                    <div class="offer-card">
+                        <p style="font-size: 0.65rem; font-weight: 900; color: #fbbf24;">HONEYMOON</p>
+                        <h4 style="font-size: 1.4rem; margin: 0.5rem 0; font-weight: 950;">Extra ₹5000 OFF</h4>
+                        <p style="font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 1.5rem;">On luxury couple suites worldwide.</p>
+                        <p style="font-weight: 950; color: var(--primary); cursor: pointer; letter-spacing: 1px;" onclick="showSection('dashboard', document.querySelector('.side-item'))">BOOK NOW</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    function showSection(sectionId, element) {
+        document.querySelectorAll('.side-item').forEach(item => item.classList.remove('active'));
+        element.classList.add('active');
+        document.querySelectorAll('.section-content').forEach(section => section.classList.remove('active'));
+        document.getElementById('section-' + sectionId).classList.add('active');
+        
+        const titles = { 'dashboard': 'Hello, {{ user.name }}', 'bookings': 'My Bookings', 'history': 'Travel History', 'tracking': 'Journey Tracking' };
+        document.getElementById('section-title').innerText = titles[sectionId];
+    }
+
+    function filterTrips() {
+        let input = document.getElementById('searchInput').value.toLowerCase();
+        let cards = document.getElementsByClassName('trip-card');
+        for (let card of cards) {
+            let title = card.getAttribute('data-title');
+            card.style.display = title.includes(input) ? "block" : "none";
+        }
+    }
+    function toggleMoreOffers() {
+        const extra = document.getElementById('extra-offers');
+        extra.style.display = extra.style.display === 'none' ? 'flex' : 'none';
+        window.scrollBy({ top: 100, behavior: 'smooth' });
+    }
+</script>
+{% endblock %}

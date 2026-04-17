@@ -1,0 +1,493 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ trip.destination }} | MakeMyTrip{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --premium: #FFD700;
+        --standard: #00BFA6;
+    }
+
+    body {
+        background: #050f1e;
+    }
+
+    .booking-panel {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border-radius: 3rem;
+        padding: 3rem;
+        position: sticky;
+        top: 6rem;
+    }
+
+    .form-section {
+        margin-bottom: 2rem;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 800;
+        font-size: 1.1rem;
+        margin-bottom: 0.8rem;
+        color: var(--primary);
+    }
+
+    /* Fix Dropdown Visibility */
+    .custom-select,
+    .custom-input {
+        width: 100%;
+        background: #0f172a;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        padding: 1.2rem;
+        border-radius: 1rem;
+        color: white !important;
+        font-weight: 700;
+        outline: none;
+        appearance: none;
+    }
+
+    .custom-select option {
+        background: #0f172a;
+        color: white;
+        padding: 10px;
+    }
+
+    .service-btn {
+        flex: 1;
+        padding: 1.5rem;
+        border-radius: 1.5rem;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        text-align: center;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .service-btn.active.premium {
+        border-color: var(--premium);
+        background: rgba(255, 215, 0, 0.1);
+    }
+
+    .service-btn.active.normal {
+        border-color: var(--standard);
+        background: rgba(0, 191, 166, 0.1);
+    }
+
+    .kyc-upload-box {
+        border: 2px dashed var(--primary);
+        padding: 2.5rem;
+        border-radius: 1.5rem;
+        text-align: center;
+        cursor: pointer;
+        transition: 0.3s;
+        background: rgba(0, 191, 166, 0.05);
+    }
+
+    .kyc-upload-box:hover {
+        background: rgba(0, 191, 166, 0.1);
+        transform: scale(1.02);
+    }
+
+    .price-breakdown {
+        background: rgba(255, 255, 255, 0.02);
+        padding: 1.5rem;
+        border-radius: 1.5rem;
+        margin-top: 1.5rem;
+        font-size: 0.9rem;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .price-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.8rem;
+    }
+
+    .price-total {
+        border-top: 1px solid var(--primary);
+        pt: 1rem;
+        mt: 1rem;
+        font-size: 1.2rem;
+        font-weight: 900;
+        color: var(--primary);
+    }
+
+    .icon-box {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        transition: 0.3s;
+    }
+
+    .cat-icon:hover .icon-box,
+    .cat-icon.active .icon-box {
+        background: var(--primary);
+        color: var(--secondary);
+        border-color: white;
+        transform: scale(1.1);
+    }
+
+    /* Date Picker Fix */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: brightness(0) invert(1);
+        cursor: pointer;
+        font-size: 1.2rem;
+    }
+    
+    input[type="date"] {
+        color-scheme: dark;
+        padding-right: 1rem;
+        color: white !important;
+    }
+</style>
+{% endblock %}
+
+{% block nav %}
+<nav
+    style="padding: 1.5rem 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 1000;">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <a href="{% url 'trips:index' %}" class="brand"
+            style="font-weight: 950; font-size: 2.22rem; text-decoration: none; color: white;">
+            <span>MakeMyTrip</span>
+        </a>
+        <a href="{% url 'accounts:logout' %}"
+            style="color: #ff8e9e; text-decoration: none; font-weight: 900; font-size: 1.1rem; text-transform: uppercase;">LOGOUT</a>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 2rem;">
+    <!-- MMT Style Category Bar -->
+    <div
+        style="display: flex; gap: 4rem; background: rgba(255,255,255,0.03); padding: 2.5rem; border-radius: 2rem; margin-bottom: 4rem; backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); justify-content: center;">
+        <div class="cat-icon" onclick="setVehicle('flight')" style="text-align: center; cursor: pointer;">
+            <div class="icon-box"><i class="fas fa-plane fa-lg"></i></div>
+            <p style="font-size: 0.7rem; margin-top: 0.5rem; font-weight: 800;">FLIGHTS</p>
+        </div>
+        <div class="cat-icon" onclick="setVehicle('bus')" style="text-align: center; cursor: pointer;">
+            <div class="icon-box"><i class="fas fa-bus fa-lg"></i></div>
+            <p style="font-size: 0.7rem; margin-top: 0.5rem; font-weight: 800;">BUS</p>
+        </div>
+        <div class="cat-icon" onclick="setVehicle('sedan')" style="text-align: center; cursor: pointer;">
+            <div class="icon-box"><i class="fas fa-car fa-lg"></i></div>
+            <p style="font-size: 0.7rem; margin-top: 0.5rem; font-weight: 800;">CAB</p>
+        </div>
+        <div class="cat-icon" onclick="setVehicle('suv')" style="text-align: center; cursor: pointer;">
+            <div class="icon-box"><i class="fas fa-shuttle-van fa-lg"></i></div>
+            <p style="font-size: 0.7rem; margin-top: 0.5rem; font-weight: 800;">SUV</p>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 4rem;">
+        <!-- Left: Info -->
+        <div style="display: flex; flex-direction: column;">
+            <h1 style="font-size: 4rem; font-weight: 950; margin-bottom: 2rem;">{{ trip.destination }}</h1>
+            <img src="{% if trip.image %}{{ trip.image.url }}{% elif trip.image_url %}{{ trip.image_url }}{% else %}https://images.unsplash.com/photo-1548013146-72479768bbaa?w=1200{% endif %}"
+                style="width: 100%; height: 500px; border-radius: 3rem; object-fit: cover; box-shadow: 0 30px 60px rgba(0,0,0,0.5);">
+
+            <div style="margin-top: 4rem;">
+                <h2 style="font-size: 2rem; font-weight: 900; margin-bottom: 2rem;">Why book this journey?</h2>
+                <p style="font-size: 1.3rem; line-height: 1.8; color: rgba(255,255,255,0.8); margin-bottom: 4rem;">{{
+                    trip.description }}</p>
+
+                {% if nearby_list %}
+                <h2 style="font-size: 2rem; font-weight: 900; margin-bottom: 2rem; color: var(--primary);">Unmissable
+                    Nearby Attractions</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    {% for place in nearby_list|slice:":12" %}
+                    <div
+                        style="background: rgba(255,255,255,0.05); padding: 1.2rem; border-radius: 1rem; border-left: 4px solid var(--primary); font-weight: 700;">
+                        <i class="fas fa-map-marker-alt" style="margin-right: 0.8rem; color: var(--primary);"></i> {{ place }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right: Real-time Booking Panel -->
+        <div class="sidebar">
+            <div class="booking-panel" style="display: flex; flex-direction: column;">
+                <h3 style="font-size: 2.22rem; font-weight: 950; margin-bottom: 2.5rem; letter-spacing: -1px;">Reserve
+                    Your Slot</h3>
+
+                <form id="bookingForm" onsubmit="event.preventDefault(); payNow();"
+                    style="display: flex; flex-direction: column;">
+                    <!-- Step 1: Vehicle -->
+                    <div class="form-section">
+                        <label class="form-label">Step 1: Choose Your Ride</label>
+                        <select class="custom-select" id="vehicle" onchange="calculate()">
+                            <option value="sedan">Luxury Sedan (₹15/km)</option>
+                            <option value="suv">Royal SUV (₹25/km)</option>
+                            <option value="bus">Sleeper Bus (Fixed Fare)</option>
+                            <option value="flight">Business Class Flight</option>
+                        </select>
+                    </div>
+
+                    <!-- Step 2: Tier -->
+                    <div class="form-section">
+                        <label class="form-label">Step 2: Service Tier</label>
+                        <div style="display: flex; gap: 1rem;">
+                            <div class="service-btn active normal" onclick="updatePrice('normal', this)"
+                                style="font-weight: 900;">Standard</div>
+                            <div class="service-btn premium" onclick="updatePrice('premium', this)"
+                                style="font-weight: 900;">★ Premium ★</div>
+                        </div>
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Premium includes
+                            5-star hotels & gourmet meals.</p>
+                    </div>
+
+                    <!-- Step 3: Travelers -->
+                    <div class="form-section">
+                        <label class="form-label">Step 3: Number of Travelers</label>
+                        <input type="number" id="travelers" class="custom-input" value="1" min="1"
+                            onchange="calculate()">
+                    </div>
+
+                    <!-- Step 4: Travel Date -->
+                    <div class="form-section">
+                        <label class="form-label">Step 4: Preferred Travel Date</label>
+                        <input type="date" id="travelDate" class="custom-input" onchange="calculate()">
+                        <p id="dateHint"
+                            style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.5rem; display: none;">
+                            Bookings open from <span id="minDateSpan"></span>.</p>
+                    </div>
+
+                    <!-- Step 5: Verification Documents -->
+                    <div class="form-section">
+                        <label class="form-label">Step 5: Identity Verification</label>
+
+                        <!-- Aadhar Row -->
+                        <div style="margin-bottom: 1.5rem;">
+                            <input type="text" id="aadharNo" class="custom-input"
+                                placeholder="Enter 12-digit Aadhar Number"
+                                style="margin-bottom: 0.8rem; height: auto; padding: 0.8rem;">
+                            <div class="kyc-upload-box" onclick="document.getElementById('aadharFile').click()"
+                                style="padding: 1.2rem;">
+                                <i class="fas fa-id-card" style="color: var(--primary); margin-bottom: 0.5rem;"></i>
+                                <p style="font-weight: 800; font-size: 0.65rem; color: white;" id="aadharLabel">UPLOAD
+                                    AADHAR PDF / IMAGE</p>
+                            </div>
+                            <input type="file" id="aadharFile" style="display: none;"
+                                onchange="updateLabel(this, 'aadharLabel')" required>
+                        </div>
+
+                        <!-- Passport Row (Conditional) -->
+                        <div id="passportSection" style="display: none;">
+                            <input type="text" id="passportNo" class="custom-input"
+                                placeholder="Enter Passport Identification No"
+                                style="margin-bottom: 0.8rem; height: auto; padding: 0.8rem;">
+                            <div class="kyc-upload-box" onclick="document.getElementById('passportFile').click()"
+                                style="padding: 1.2rem;">
+                                <i class="fas fa-passport" style="color: var(--primary); margin-bottom: 0.5rem;"></i>
+                                <p style="font-weight: 800; font-size: 0.65rem; color: white;" id="passportLabel">UPLOAD
+                                    PASSPORT COPY</p>
+                            </div>
+                            <input type="file" id="passportFile" style="display: none;"
+                                onchange="updateLabel(this, 'passportLabel')">
+                        </div>
+                    </div>
+
+                    <!-- Detailed Price Breakdown -->
+                    <div class="price-breakdown">
+                        <div class="price-row"><span>Fare + Vehicle</span><span id="baseFare">₹0</span></div>
+                        <div class="price-row"><span>Service Fee (5%)</span><span id="serviceFee">₹0</span></div>
+                        <div class="price-row"><span>GST (18%)</span><span id="gst">₹0</span></div>
+                        <div class="price-row"><span>Toll & Fees</span><span id="toll">₹500</span></div>
+                        <div class="price-total">
+                            <div class="price-row" style="margin: 0;"><span>TOTAL</span><span id="finalTotal">₹0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary"
+                        style="margin-top: 2rem; padding: 1.5rem; font-size: 1.4rem; font-weight: 950; border-radius: 99px;">CONFIRM
+                        & PAY NOW</button>
+
+                    <p
+                        style="font-size: 0.8rem; margin-top: 1.5rem; text-align: center; opacity: 0.6; font-weight: 800;">
+                        Secure SSL Encrypted Payment Gate
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    let currentTier = 'normal';
+    const TRIP_BASE = '{{ trip.price }}';
+
+    function updatePrice(tier, el) {
+        document.querySelectorAll('.service-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        currentTier = tier;
+        calculate();
+    }
+
+    function setVehicle(type) {
+        document.getElementById('vehicle').value = type;
+        document.querySelectorAll('.cat-icon').forEach(i => i.classList.remove('active'));
+        calculate();
+    }
+
+    function calculate() {
+        let vehicle = document.getElementById('vehicle').value;
+        let travelers = parseInt(document.getElementById('travelers').value) || 1;
+
+        // Conditional Passport Logic
+        const passportSection = document.getElementById('passportSection');
+        if (vehicle === 'flight') {
+            passportSection.style.display = 'block';
+        } else {
+            passportSection.style.display = 'none';
+        }
+
+        // Date Logic
+        const travelDate = document.getElementById('travelDate');
+        const dateHint = document.getElementById('dateHint');
+        const minDateSpan = document.getElementById('minDateSpan');
+
+        let today = new Date();
+        let minDate = new Date();
+
+        if (vehicle === 'bus') {
+            // Fixed date for Bus
+            let fixedDate = new Date();
+            fixedDate.setDate(today.getDate() + 14);
+            travelDate.valueAsDate = fixedDate;
+            travelDate.readOnly = true;
+            dateHint.style.display = 'none';
+        } else {
+            // Freeze Today and Past: min = Tomorrow
+            minDate.setDate(today.getDate() + 1);
+            travelDate.readOnly = false;
+            let minISO = minDate.toISOString().split('T')[0];
+            travelDate.setAttribute('min', minISO);
+            minDateSpan.innerText = minDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+            dateHint.style.display = 'block';
+
+            if (travelDate.value && travelDate.value < minISO) {
+                travelDate.value = minISO;
+            }
+        }
+
+        // Price Math
+        let base = TRIP_BASE * travelers;
+        if (currentTier === 'premium') base *= 1.5;
+
+        // Vehicle Multipliers
+        if (vehicle === 'suv') base *= 1.25;
+        if (vehicle === 'flight') base *= 2.5;
+
+        let service = base * 0.05;
+        let gst = (base + service) * 0.18;
+        let toll = 500 * (Math.ceil(travelers / 4));
+        let total = base + service + gst + toll;
+
+        document.getElementById('baseFare').innerText = '₹' + base.toFixed(0);
+        document.getElementById('serviceFee').innerText = '₹' + service.toFixed(0);
+        document.getElementById('gst').innerText = '₹' + gst.toFixed(0);
+        document.getElementById('toll').innerText = '₹' + toll.toFixed(0);
+        document.getElementById('finalTotal').innerText = '₹' + total.toFixed(0);
+    }
+
+    async function payNow() {
+        let finalAmtText = document.getElementById('finalTotal').innerText.replace('₹', '');
+        let finalAmt = parseFloat(finalAmtText);
+
+        if (isNaN(finalAmt) || finalAmt <= 0) {
+            return alert("Total amount calculation is pending. Please select vehicle and tier.");
+        }
+
+        try {
+            // STEP 1: Get Order ID from Backend
+            const response = await fetch("{% url 'bookings:initiate_payment' %}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ total_price: finalAmt })
+            });
+            const orderData = await response.json();
+
+            if (orderData.status !== 'success') {
+                throw new Error("Could not initiate payment session.");
+            }
+
+            // STEP 2: Open Razorpay with Order ID
+            var options = {
+                "key": "{{ RAZORPAY_KEY_ID }}",
+                "amount": orderData.amount,
+                "currency": "INR",
+                "name": "MakeMyTrip Premium",
+                "description": "Premium Experience Reservation",
+                "image": "https://i.ibb.co/vzr5K2r/logo.png",
+                "order_id": orderData.order_id, 
+                "modal": {
+                    "ondismiss": function() {
+                        if(confirm("DEMO MODE: If your test bank is failing, would you like to bypass the gateway and CONFIRM this booking anyway for your project demo?")) {
+                            completeBookingDirectly(finalAmt);
+                        }
+                    }
+                },
+                "handler": function (response) {
+                    const travelersCount = document.getElementById('travelers').value;
+                    completeBookingDirectly(finalAmt, travelersCount);
+                },
+                "prefill": {
+                    "name": "{{ user.name }}",
+                    "email": "{{ user.email }}",
+                    "contact": "{{ user.phone }}"
+                },
+                "theme": {
+                    "color": "#00BFA6"
+                }
+            };
+
+            var rzp1 = new Razorpay(options);
+            rzp1.open();
+
+        } catch (e) {
+            console.error("Payment Error:", e);
+            if(confirm("Gateway Connectivity Error. Would you like to use the SIMULATED SUCCESS mode for your project presentation?")) {
+                const travelersCount = document.getElementById('travelers').value;
+                completeBookingDirectly(finalAmt, travelersCount);
+            }
+        }
+    }
+
+    function completeBookingDirectly(amount, seatsCount) {
+        const trip_id = "{{ trip.id }}";
+        const seats = seatsCount || document.getElementById('travelers').value;
+        const total_price = amount;
+
+        fetch("{% url 'bookings:api_create_booking' %}", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ trip_id, seats, total_price })
+        }).then(res => res.json()).then(data => {
+            if(data.status === 'success') {
+                alert("Booking Confirmed Successfully (Demo Mode)!");
+                window.location.href = "{% url 'dashboard:customer_dashboard' %}";
+            }
+        });
+    }
+
+    function updateLabel(input, labelId) {
+        if (input.files && input.files[0]) {
+            document.getElementById(labelId).innerText = "DONE: " + input.files[0].name.substring(0, 5) + "...";
+            document.getElementById(labelId).style.color = "#00BFA6";
+        }
+    }
+
+    window.onload = calculate;
+</script>
+{% endblock %}

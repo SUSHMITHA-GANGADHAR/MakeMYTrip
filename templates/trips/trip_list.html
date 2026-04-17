@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Explore Trips | MakeMyTrip{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        margin: 4rem 0;
+        text-align: center;
+    }
+
+    .page-header h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .filters {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 3rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .filter-btn {
+        padding: 0.5rem 1.5rem;
+        border-radius: 9999px;
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .filter-btn.active, .filter-btn:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .trip-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 2rem;
+    }
+
+    .trip-card .trip-img {
+        height: 250px;
+        width: 100%;
+        object-fit: cover;
+    }
+
+    .trip-body {
+        padding: 1.5rem;
+    }
+
+    .trip-meta {
+        display: flex;
+        justify-content: space-between;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .trip-price {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <!-- Nature Hero Section -->
+    <div style="position: relative; height: 600px; width: 100vw; margin-left: calc(-50vw + 50%); margin-top: -8rem; margin-bottom: 5rem; overflow: hidden; display: flex; align-items: center; justify-content: center; text-align: center;">
+        <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070" style="position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; z-index: -1;">
+        <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to bottom, rgba(2,6,23,0.3), rgba(2,6,23,0.95)); z-index: 0;"></div>
+        
+        <div class="container" style="position: relative; z-index: 1;">
+            <p style="text-transform: uppercase; letter-spacing: 5px; color: var(--primary); font-weight: 950; margin-bottom: 1.5rem;" class="reveal">Explore the World</p>
+            <h1 style="font-size: 5.5rem; line-height: 1; margin-bottom: 2rem; text-shadow: 0 10px 30px rgba(0,0,0,0.5);" class="reveal">DISCOVER NATURE'S <br><span style="color: var(--primary);">UNTOUCHED</span> BEAUTY</h1>
+            <div class="reveal" style="display: flex; gap: 2rem; justify-content: center; margin-top: 3rem;">
+                <a href="#trips" class="btn btn-primary" style="padding: 1.2rem 3rem;">View All Plans</a>
+                <a href="#about" class="btn btn-outline" style="padding: 1.2rem 3rem; border-width: 2px;">Learn More</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="trips">
+        <div class="page-header">
+            <h2 style="font-size: 3rem; margin-bottom: 1rem;">Curated Expeditions</h2>
+            <p style="color: var(--text-muted); font-size: 1.2rem; font-weight: 700;">Handpicked adventures for the modern explorer.</p>
+        </div>
+
+    <div class="filters">
+        <button class="filter-btn active">All</button>
+        <button class="filter-btn">Mountains</button>
+        <button class="filter-btn">Beaches</button>
+        <button class="filter-btn">Cultural</button>
+        <button class="filter-btn">Adventure</button>
+    </div>
+
+    <div class="trip-grid">
+        {% for trip in trips %}
+        <div class="trip-card" style="display: flex; flex-direction: column; min-height: 520px; background: rgba(15, 23, 42, 0.4);">
+            <div class="trip-image" style="position: relative;">
+                <img src="{% if trip.image %}{{ trip.image.url }}{% elif trip.image_url %}{{ trip.image_url }}{% else %}https://images.unsplash.com/photo-1548013146-72479768bbaa?w=800{% endif %}" alt="{{ trip.destination }}" class="trip-img">
+                <div class="price-tag" style="position: absolute; top: 1rem; right: 1rem; background: var(--primary); padding: 0.5rem 1rem; border-radius: 5px; font-weight: bold;">₹{{ trip.price }}</div>
+            </div>
+            <div class="trip-body" style="flex: 1; display: flex; flex-direction: column;">
+                <div class="trip-meta">
+                    <span><i class="far fa-clock"></i> {{ trip.duration }}</span>
+                    <span><i class="fas fa-users"></i> {{ trip.available_seats }} No of Seats</span>
+                </div>
+                <h3 style="margin-bottom: 1rem; color: white;">{{ trip.destination }}</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; flex: 1;">
+                    {{ trip.description|truncatewords:20 }}
+                </p>
+                <a href="{% url 'trips:trip_detail' trip.pk %}" class="btn btn-primary" style="width: 100%; text-align: center; border-radius: 99px;">VIEW EXPERIENCE</a>
+            </div>
+        </div>
+        {% empty %}
+        <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">No trips found match your search.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

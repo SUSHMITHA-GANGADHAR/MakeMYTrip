@@ -1,0 +1,454 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}MakeMyTrip | Premium Travel Experiences{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hero Section Enhancements */
+    .hero {
+        height: 100vh;
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-top: -5rem;
+        position: relative;
+        background: url('https://images.unsplash.com/photo-1548013146-72479768bbaa?w=1600&auto=format&fit=crop&q=80') no-repeat center center;
+        background-size: 110%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        color: white;
+        overflow: hidden;
+        animation: zoomEffect 20s infinite alternate ease-in-out;
+    }
+
+    /* Grain/Video Effect Overlay */
+    .hero::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: url('https://grainy-gradients.vercel.app/noise.svg');
+        opacity: 0.15;
+        z-index: 2;
+        pointer-events: none;
+    }
+
+    @keyframes zoomEffect {
+        from { background-size: 100%; transform: scale(1); }
+        to { background-size: 115%; transform: scale(1.05); }
+    }
+
+    .hero::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: radial-gradient(circle at center, rgba(10, 37, 64, 0.1) 0%, rgba(10, 37, 64, 0.85) 100%);
+        z-index: 1;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 3;
+        max-width: 900px;
+        padding: 0 2rem;
+        background: rgba(10, 37, 64, 0.1);
+        backdrop-filter: blur(4px);
+        padding: 4rem;
+        border-radius: 2rem;
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .hero h1 {
+        font-size: clamp(3.5rem, 10vw, 5.5rem);
+        line-height: 1.1;
+        margin-bottom: 2rem;
+        color: #fff;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: -2px;
+        filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5));
+    }
+
+    .hero p {
+        font-size: 1.5rem;
+        margin-bottom: 3rem;
+        color: rgba(255,255,255,0.9);
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+        font-weight: 400;
+        line-height: 1.4;
+    }
+
+    /* Contact Form Styling */
+    .contact-form {
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        padding: 3rem;
+        border-radius: 1.5rem;
+    }
+    .contact-input {
+        width: 100%;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        background: var(--bg-muted);
+        border: 1px solid var(--glass-border);
+        border-radius: 0.75rem;
+        color: white;
+        outline: none;
+        transition: 0.3s;
+    }
+    .contact-input:focus { border-color: var(--primary); }
+
+    /* Section Styling */
+    .section {
+        padding: 8rem 0;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 5rem;
+    }
+
+    .section-header h2 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: var(--primary);
+    }
+
+    .section-header p {
+        color: var(--text-muted);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    /* Services Grid */
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .service-card {
+        padding: 3rem 2rem;
+        text-align: center;
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 1.5rem;
+        transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .service-card:hover {
+        transform: translateY(-10px);
+        background: rgba(255,255,255,0.08);
+        border-color: var(--primary);
+    }
+
+    .service-card i {
+        font-size: 3rem;
+        color: var(--primary);
+        margin-bottom: 1.5rem;
+    }
+
+    /* Trips Grid */
+    .trips-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2.5rem;
+    }
+
+    .trip-card {
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 1.5rem;
+        overflow: hidden;
+        transition: 0.4s;
+    }
+
+    .trip-card:hover {
+        transform: translateY(-10px);
+        border-color: var(--primary);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .trip-image {
+        height: 250px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .trip-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: 0.6s;
+    }
+
+    .trip-card:hover .trip-image img {
+        transform: scale(1.1);
+    }
+
+    .trip-badge {
+        position: absolute;
+        top: 1rem; right: 1rem;
+        background: var(--primary);
+        color: var(--secondary);
+        padding: 0.5rem 1rem;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+
+    .trip-content {
+        padding: 2rem;
+    }
+
+    .trip-details {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    /* Button Smoothing - Ultra Smooth */
+    .btn {
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+    .btn::after {
+        content: '';
+        position: absolute;
+        bottom: 0; left: 0; width: 100%; height: 0;
+        background: rgba(255,255,255,0.1);
+        transition: 0.3s;
+        z-index: -1;
+    }
+    .btn:hover::after { height: 100%; }
+    
+    .btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 191, 166, 0.4);
+    }
+
+    /* Staggered Reveal */
+    .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .services-grid .reveal:nth-child(1) { transition-delay: 0.1s; }
+    .services-grid .reveal:nth-child(2) { transition-delay: 0.2s; }
+    .services-grid .reveal:nth-child(3) { transition-delay: 0.3s; }
+
+    /* Parallax-like Background movement */
+    .hero {
+        perspective: 1000px;
+    }
+    .hero-content {
+        transform: translateZ(0); /* Hardware acceleration */
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .floating {
+        animation: floating 3s ease-in-out infinite;
+    }
+
+    @keyframes floating {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero" id="home">
+    <div class="hero-content">
+        <h1 class="reveal">Experience the <br><span style="color: var(--primary);">World Together</span></h1>
+        <p class="reveal">Join thousands of travelers who trust MakeMyTrip for their soul-searching journeys and luxury escapes across the globe.</p>
+        <div class="reveal" style="display: flex; gap: 1.5rem; justify-content: center;">
+            <a href="{% url 'trips:trip_list' %}" class="btn btn-primary" style="padding: 1.2rem 3rem; font-size: 1.1rem; font-weight: 700;">Start Your Journey</a>
+            <a href="#about" class="btn btn-outline" style="padding: 1.2rem 3rem; font-size: 1.1rem;">Our Heritage</a>
+        </div>
+    </div>
+</section>
+
+<!-- Trips Section -->
+<section id="trips" class="section">
+    <div class="container">
+        <div class="section-header reveal">
+            <h2>Top Rated Trips</h2>
+            <p>Hand-picked journeys that are currently trending among our community.</p>
+        </div>
+        <div class="trips-grid">
+            {% for trip in top_trips|slice:":3" %}
+            <div class="trip-card reveal">
+                <div class="trip-image">
+                    {% if trip.image %}
+                        <img src="{{ trip.image.url }}" alt="{{ trip.destination }}">
+                    {% else %}
+                        <img src="https://images.unsplash.com/photo-1548013146-72479768bbaa?w=800" alt="Destination">
+                    {% endif %}
+                    <div class="trip-badge">₹{{ trip.price }}</div>
+                </div>
+                <div class="trip-content">
+                    <div class="trip-details">
+                        <span><i class="far fa-clock"></i> {{ trip.duration }}</span>
+                        <span><i class="fas fa-users"></i> {{ trip.available_seats }} seats left</span>
+                    </div>
+                    <h3 style="margin-bottom: 1rem;">{{ trip.destination }}</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem;">
+                        {{ trip.description|truncatewords:20 }}
+                    </p>
+                    <a href="{% url 'trips:trip_detail' trip.pk %}" class="btn btn-outline" style="width: 100%; text-align: center;">View Experience</a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="reveal" style="grid-column: 1/-1; text-align: center; padding: 4rem;">
+                <p style="color: var(--text-muted);">New batches of adventures are being prepared. Check back soon!</p>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="reveal" style="text-align: center; margin-top: 5rem;">
+            <a href="{% url 'trips:trip_list' %}" class="btn btn-primary">Browse All Destinations</a>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="section">
+    <div class="container">
+        <div class="section-header reveal">
+            <h2>About Us</h2>
+            <p>We are more than a travel agency. We are crafters of memories, bridges between cultures, and your companions in discovery.</p>
+        </div>
+        <div class="glass-card reveal" style="padding: 4rem; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;">
+            <div>
+                <h3 style="font-size: 2rem; margin-bottom: 1.5rem;">Why MakeMyTrip?</h3>
+                <p style="color: var(--text-muted); margin-bottom: 2rem;">
+                    Founded with a passion for the diverse landscapes of India, MakeMyTrip has grown into the nation's premier travel platform. We believe that travel should be seamless, soulful, and tailored to the individual.
+                </p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <h4 style="color: var(--primary); font-size: 1.5rem;">10k+</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);">Happy Travelers</p>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--primary); font-size: 1.5rem;">500+</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);">Partner Hotels</p>
+                    </div>
+                </div>
+            </div>
+            <div style="position: relative;">
+                <img src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=800" alt="India Travel" style="width: 100%; border-radius: 1rem; box-shadow: 20px 20px 0 var(--primary);">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section id="services" class="section" style="background: rgba(0,0,0,0.2);">
+    <div class="container">
+        <div class="section-header reveal">
+            <h2>Our Services</h2>
+            <p>From the moment you dream to the moment you return, we've got you covered.</p>
+        </div>
+        <div class="services-grid">
+            <div class="service-card reveal">
+                <i class="fas fa-hotel"></i>
+                <h3>Luxury Stays</h3>
+                <p style="color: var(--text-muted);">We handpick every partner hotel to ensure the highest standards of luxury and safety.</p>
+            </div>
+            <div class="service-card reveal">
+                <i class="fas fa-shuttle-van"></i>
+                <h3>Seamless Transport</h3>
+                <p style="color: var(--text-muted);">Reliable, professional transport options tailored to your group's size and comfort.</p>
+            </div>
+            <div class="service-card reveal">
+                <i class="fas fa-map-marked-alt"></i>
+                <h3>Expert Guides</h3>
+                <p style="color: var(--text-muted);">Local experts who bring history and culture to life with stories you won't find in books.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="section">
+    <div class="container">
+        <div class="section-header reveal">
+            <h2>Contact Us</h2>
+            <p>Have questions? Our team is available 24/7 to help you plan your perfect trip.</p>
+        </div>
+        <div class="reveal" style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 4rem; max-width: 1100px; margin: 0 auto;">
+            <!-- Demo Info Column -->
+            <div class="glass-card" style="padding: 3rem;">
+                <h3 style="margin-bottom: 2rem;">Get in Touch</h3>
+                <div style="margin-bottom: 2rem; display: flex; gap: 1.5rem; align-items: start;">
+                    <i class="fas fa-map-marker-alt" style="color: var(--primary); font-size: 1.5rem; margin-top: 0.3rem;"></i>
+                    <div>
+                        <h4 style="margin-bottom: 0.3rem;">Visit Us</h4>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">123 Travel Avenue, Heritage Block<br>New Delhi, India - 110001</p>
+                    </div>
+                </div>
+                <div style="margin-bottom: 2rem; display: flex; gap: 1.5rem; align-items: start;">
+                    <i class="fas fa-phone-alt" style="color: var(--primary); font-size: 1.5rem; margin-top: 0.3rem;"></i>
+                    <div>
+                        <h4 style="margin-bottom: 0.3rem;">Call Us</h4>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">+91 98765 43210<br>Mon - Sat: 9am - 8pm</p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 1.5rem; align-items: start;">
+                    <i class="fas fa-envelope" style="color: var(--primary); font-size: 1.5rem; margin-top: 0.3rem;"></i>
+                    <div>
+                        <h4 style="margin-bottom: 0.3rem;">Email Us</h4>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">info@MakeMyTrip.com<br>support@MakeMyTrip.com</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Column -->
+            <div class="contact-form">
+                <form>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <input type="text" placeholder="Your Name" class="contact-input" required>
+                        <input type="email" placeholder="Your Email" class="contact-input" required>
+                    </div>
+                    <input type="text" placeholder="Subject" class="contact-input" required>
+                    <textarea placeholder="Your Message" class="contact-input" style="height: 150px; resize: none;" required></textarea>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1.2rem;">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="section">
+    <div class="container">
+        <div class="glass-card reveal" style="padding: 6rem; text-align: center; background: linear-gradient(135deg, var(--primary), var(--secondary)); position: relative; overflow: hidden;">
+            <div style="position: relative; z-index: 2;">
+                <h2 style="font-size: 3rem; margin-bottom: 1.5rem; color: white;">Ready to start your journey?</h2>
+                <p style="color: rgba(255,255,255,0.9); margin-bottom: 3rem; font-size: 1.2rem;">Join thousands of travelers exploring India.</p>
+                <a href="{% url 'accounts:register' %}" class="btn btn-primary" style="background: white; color: var(--secondary); padding: 1rem 3rem; font-size: 1.1rem;">Create Free Account</a>
+            </div>
+            <div style="position: absolute; top: -50%; right: -10%; width: 500px; height: 500px; background: rgba(255,255,255,0.1); border-radius: 50%; z-index: 1;"></div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

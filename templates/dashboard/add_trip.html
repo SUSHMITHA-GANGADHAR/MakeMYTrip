@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Add New Trip | MakeMyTrip{% endblock %}
+
+{% block content %}
+<div class="glass-card" style="max-width: 800px; margin: 4rem auto; padding: 3rem;">
+    <h1 style="margin-bottom: 2rem;">Create New Trip Plan</h1>
+    
+    <form method="POST">
+        {% csrf_token %}
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <div class="form-group">
+                <label>Destination (Indian City)</label>
+                <input type="text" name="destination" required class="form-control" style="width: 100%; padding: 0.8rem; background: var(--bg-muted); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: white;">
+            </div>
+            <div class="form-group">
+                <label>Duration (e.g., 5 Days / 4 Nights)</label>
+                <input type="text" name="duration" required class="form-control" style="width: 100%; padding: 0.8rem; background: var(--bg-muted); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: white;">
+            </div>
+            <div class="form-group">
+                <label>Price (per person)</label>
+                <input type="number" name="price" required class="form-control" style="width: 100%; padding: 0.8rem; background: var(--bg-muted); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: white;">
+            </div>
+            <div class="form-group">
+                <label>Total Seats</label>
+                <input type="number" name="total_seats" required class="form-control" style="width: 100%; padding: 0.8rem; background: var(--bg-muted); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: white;">
+            </div>
+        </div>
+
+        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--glass-border);">
+            <h3><i class="fas fa-hotel"></i> Hotel Partnership</h3>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Admin must assign a partner hotel based on trip location.</p>
+            <div class="form-group">
+                <label>Partner Hotel Name</label>
+                <input type="text" name="hotel_name" required placeholder="e.g., Taj Exotica, Goa" style="width: 100%; padding: 0.8rem; background: var(--bg-muted); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: white;">
+            </div>
+        </div>
+
+        <div style="margin-top: 2rem;">
+            <label>Trip Description (Min 5 places to visit)</label>
+            <textarea name="description" rows="5" required style="width: 100%; padding: 0.8rem; background: var(--bg-muted); border: 1px solid var(--glass-border); border-radius: 0.5rem; color: white;" placeholder="Describe the 5 places to visit in this India-based trip..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2.5rem; padding: 1rem;">Launch Trip Plan</button>
+    </form>
+</div>
+{% endblock %}

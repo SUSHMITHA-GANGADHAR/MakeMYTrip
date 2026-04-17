@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Book {{ trip.destination }} | MakeMyTrip{% endblock %}
+
+{% block extra_css %}
+<style>
+    .booking-wrapper {
+        max-width: 900px;
+        margin: 4rem auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+
+    .trip-summary {
+        background: var(--bg-muted);
+        padding: 2rem;
+        border-radius: 1.5rem;
+        height: min-content;
+    }
+
+    .form-section {
+        padding: 2.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 2rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.75rem;
+        color: var(--text-muted);
+    }
+
+    .seats-input {
+        width: 100%;
+        padding: 1rem;
+        background: var(--bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 0.75rem;
+        color: white;
+        font-size: 1.1rem;
+    }
+
+    .total-display {
+        background: rgba(99, 102, 241, 0.1);
+        padding: 1.5rem;
+        border-radius: 1rem;
+        margin-top: 2rem;
+        border: 1px dashed var(--primary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="booking-wrapper">
+    <div class="trip-summary">
+        <h3 style="margin-bottom: 1.5rem;">Trip Summary</h3>
+        <p style="font-size: 1.2rem; margin-bottom: 0.5rem;">{{ trip.destination }}</p>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">{{ trip.duration }}</p>
+        
+        <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--glass-border); padding-top: 1rem;">
+            <span>Price per person</span>
+            <strong>₹{{ trip.price }}</strong>
+        </div>
+    </div>
+
+    <div class="glass-card form-section">
+        <h2>Confirm Booking</h2>
+        <p style="color: var(--text-muted); margin-bottom: 2rem;">Please select the number of seats you'd like to book.</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Number of Seats</label>
+                <input type="number" name="seats" value="1" min="1" max="{{ trip.available_seats }}" class="seats-input" required>
+            </div>
+
+            <div class="total-display">
+                <div style="display: flex; justify-content: space-between; font-size: 1.1rem;">
+                    <span>Wait estimated total</span>
+                    <strong id="total-price">₹{{ trip.price }}</strong>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem; padding: 1rem;">Proceed to Payment</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const pricePerSeat = {{ trip.price }};
+    const input = document.querySelector('input[name="seats"]');
+    const display = document.getElementById('total-price');
+
+    input.addEventListener('input', () => {
+        const value = parseInt(input.value) || 0;
+        display.textContent = '₹' + (value * pricePerSeat).toLocaleString();
+    });
+</script>
+{% endblock %}

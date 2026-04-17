@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome | MakeMyTrip</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #0A2540;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .splash-container {
+            position: relative;
+            z-index: 10;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .airplane {
+            width: 280px;
+            filter: drop-shadow(0 0 40px rgba(0, 191, 166, 0.6));
+            animation: flight 5s ease-in-out infinite;
+            transition: all 1.5s cubic-bezier(0.7, 0, 0.3, 1);
+        }
+
+        @keyframes flight {
+            0%, 100% { transform: translateY(0) rotate(-5deg) scale(1); }
+            50% { transform: translateY(-40px) rotate(5deg) scale(1.05); }
+        }
+
+        .bg-video {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            filter: brightness(0.4) saturate(1.2);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, transparent 0%, rgba(10, 37, 64, 0.8) 100%);
+            z-index: 0;
+        }
+
+        .text {
+            color: #fff;
+            margin-top: 2rem;
+            font-size: 1rem;
+            letter-spacing: 12px;
+            font-weight: 400;
+            opacity: 0;
+            animation: fadeIn 3s forwards 1s;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(0, 191, 166, 0.8);
+        }
+
+        .fly-away {
+            transform: scale(0.1) translate(1000%, -1000%) rotate(30deg);
+            opacity: 0;
+            filter: blur(20px);
+        }
+
+        @keyframes fadeIn { to { opacity: 0.8; } }
+    </style>
+</head>
+<body>
+    <video autoplay muted loop playsinline class="bg-video">
+        <source src="https://assets.mixkit.co/videos/preview/mixkit-clouds-and-blue-sky-background-1563-large.mp4" type="video/mp4">
+    </video>
+    <div class="overlay"></div>
+
+    <div class="splash-container" onclick="launchSite()">
+        <!-- Premium SVG Airplane -->
+        <svg class="airplane" id="airplane" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 16.5L13.5 12V4.5C13.5 3.67 12.83 3 12 3C11.17 3 10.5 3.67 10.5 4.5V12L3 16.5V18L10.5 15.75V21L12 22.5L13.5 21V15.75L21 18V16.5Z" fill="#00BFA6"/>
+        </svg>
+        <div class="text">Boarding Now</div>
+    </div>
+
+    <script>
+        function launchSite() {
+            const airplane = document.getElementById('airplane');
+            airplane.classList.add('fly-away');
+            
+            // "Cloud transition" effect
+            const transitionDiv = document.createElement('div');
+            transitionDiv.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: white; opacity: 0; z-index: 100;
+                transition: opacity 1.2s ease-in;
+                pointer-events: none;
+            `;
+            document.body.appendChild(transitionDiv);
+            
+            setTimeout(() => {
+                transitionDiv.style.opacity = "1";
+            }, 100);
+
+            setTimeout(() => {
+                window.location.href = "{% url 'trips:index' %}";
+            }, 1200);
+        }
+    </script>
+</body>
+</html>

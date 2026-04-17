@@ -1,0 +1,8 @@
+django
+django-environ
+django-cors-headers
+whitenoise
+gunicorn
+razorpay
+pillow
+psycopg2-binary

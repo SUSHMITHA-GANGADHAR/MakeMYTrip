@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard | MakeMyTrip{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+
+    .stat-card {
+        padding: 2rem;
+        background: var(--bg-muted);
+        border: 1px solid var(--glass-border);
+        border-radius: 1.5rem;
+    }
+
+    .stat-card h3 {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-card .value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .admin-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+    }
+
+    .quick-actions {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="margin-top: 3rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h1>Admin Dashboard</h1>
+        <div class="quick-actions">
+            <a href="{% url 'dashboard:add_trip' %}" class="btn btn-primary"><i class="fas fa-plus"></i> New Trip</a>
+            <a href="{% url 'dashboard:manage_bookings' %}" class="btn btn-outline">Manage Bookings</a>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Total Trips</h3>
+            <div class="value">{{ total_trips }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Total Bookings</h3>
+            <div class="value">{{ total_bookings }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Booked Seats</h3>
+            <div class="value">{{ booked_seats }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Vacant Seats</h3>
+            <div class="value">{{ vacant_seats }}</div>
+        </div>
+    </div>
+
+    <div class="admin-grid">
+        <div class="glass-card" style="padding: 2rem;">
+            <h2>Popular Destinations</h2>
+            <canvas id="tripsChart" style="margin-top: 2rem;"></canvas>
+        </div>
+        
+        <div class="sidebar">
+            <div class="glass-card" style="padding: 2rem; margin-bottom: 1.5rem;">
+                <h3>System Health</h3>
+                <ul style="list-style: none; margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+                    <li style="margin-bottom: 1rem;"><i class="fas fa-database" style="color: var(--primary);"></i> Database: Connected</li>
+                    <li style="margin-bottom: 1rem;"><i class="fas fa-shield-alt" style="color: var(--primary);"></i> Security: Active</li>
+                    <li><i class="fas fa-server" style="color: var(--primary);"></i> Server: Online</li>
+                </ul>
+            </div>
+            
+            <a href="{% url 'dashboard:payment_records' %}" class="glass-card" style="padding: 1.5rem; display: block; text-decoration: none; color: white; margin-bottom: 1rem;">
+                <i class="fas fa-receipt"></i> Payment Records
+            </a>
+            <a href="{% url 'dashboard:customer_history' %}" class="glass-card" style="padding: 1.5rem; display: block; text-decoration: none; color: white;">
+                <i class="fas fa-users"></i> Customer History
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    const ctx = document.getElementById('tripsChart').getContext('2d');
+    const data = {{ trips_data|safe }};
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: data.map(t => t.destination),
+            datasets: [{
+                label: 'Bookings per Trip',
+                data: data.map(t => t.booking_count),
+                backgroundColor: 'rgba(0, 191, 166, 0.5)',
+                borderColor: '#00BFA6',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
+                x: { grid: { display: false } }
+            },
+            plugins: {
+                legend: { labels: { color: '#94a3b8' } }
+            }
+        }
+    });
+</script>
+{% endblock %}

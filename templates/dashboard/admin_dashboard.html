@@ -1,0 +1,625 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard - Make My Trip{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --sidebar-w: 280px;
+    }
+    body { background: #020617; }
+    
+    .admin-wrapper {
+        display: flex;
+        min-height: 100vh;
+        padding-left: var(--sidebar-w);
+    }
+
+    /* Cinematic Sidebar - Full Vertical Height */
+    .admin-sidebar {
+        width: var(--sidebar-w);
+        background: rgba(15, 23, 42, 0.65);
+        backdrop-filter: blur(50px);
+        border-right: 1px solid rgba(255, 255, 255, 0.25);
+        padding: 4rem 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+        position: fixed;
+        top: 0; left: 0;
+        height: 100vh;
+        z-index: 1000;
+        border-radius: 0;
+    }
+
+    .sidebar-link {
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        padding: 1.2rem 1.8rem;
+        border-radius: 1.2rem;
+        color: rgba(255,255,255,0.4);
+        text-decoration: none;
+        font-weight: 800;
+        transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 0.85rem;
+    }
+
+    .sidebar-link i { font-size: 1.2rem; width: 24px; text-align: center; }
+
+    .sidebar-link:hover, .sidebar-link.active {
+        background: var(--primary);
+        color: var(--secondary);
+        transform: scale(1.05);
+        box-shadow: 0 10px 40px rgba(0, 191, 166, 0.3);
+    }
+
+    /* Main Dashboard Area */
+    .admin-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 3rem;
+        padding: 4rem;
+        padding-bottom: 5rem;
+    }
+
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
+    }
+
+    .admin-stat-card {
+        background: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.25);
+        border-radius: 2rem;
+        padding: 2.5rem;
+        backdrop-filter: blur(30px);
+        transition: 0.4s;
+    }
+    .admin-stat-card:hover { 
+        background: rgba(255,255,255,0.08);
+        border-color: var(--primary);
+        transform: translateY(-8px);
+    }
+
+    .admin-stat-card p {
+        font-size: 0.85rem;
+        font-weight: 850;
+        text-transform: uppercase;
+        color: var(--primary);
+        letter-spacing: 2px;
+        margin-bottom: 0.8rem;
+    }
+
+    .admin-stat-card h3 {
+        font-size: 3rem;
+        font-weight: 950;
+        color: white;
+    }
+
+    .chart-box {
+        background: rgba(255,255,255,0.12);
+        border: 1px solid rgba(255,255,255,0.25);
+        border-radius: 3rem;
+        padding: 3rem;
+        backdrop-filter: blur(30px);
+    }
+
+    .chart-box h4 {
+        font-size: 1.5rem;
+        font-weight: 950;
+        margin-bottom: 2.5rem;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-wrapper">
+    <!-- Redesigned Menu Sidebar -->
+    <div class="admin-sidebar">
+        <div style="margin-bottom: 2rem; padding: 0 1rem;">
+            <p style="font-size: 0.7rem; font-weight: 900; color: var(--primary); letter-spacing: 3px; text-transform: uppercase;">Operations</p>
+        </div>
+        <a href="javascript:void(0)" onclick="showSection('overview')" class="sidebar-link active"><i class="fas fa-chart-pie"></i> OVERVIEW</a>
+        <a href="javascript:void(0)" onclick="showSection('trips')" class="sidebar-link"><i class="fas fa-map-marked-alt"></i> MANAGE TRIPS</a>
+        <a href="javascript:void(0)" onclick="showSection('bookings')" class="sidebar-link"><i class="fas fa-calendar-check"></i> BOOKINGS</a>
+        <a href="javascript:void(0)" onclick="showSection('customers')" class="sidebar-link"><i class="fas fa-user-shield"></i> CUSTOMERS</a>
+        <a href="javascript:void(0)" onclick="showSection('hotels')" class="sidebar-link"><i class="fas fa-hotel"></i> HOTELS</a>
+        
+        <div style="margin-top: auto; padding: 1rem;">
+            <a href="{% url 'accounts:logout' %}" style="color: #ff8e9e; text-decoration: none; font-weight: 900; font-size: 0.9rem;">
+                <i class="fas fa-power-off"></i> LOGOUT
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Operational Workspace -->
+    <div class="admin-main">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 class="h-massive" id="main-title">Operational Alpha</h1>
+                <p class="p-large" id="main-subtitle">Real-time control center for MakeMyTrip operations.</p>
+            </div>
+            <button onclick="showSection('add-trip')" class="btn btn-primary" style="padding: 1rem 2rem; border-radius: 99px;">+ CREATE NEW PLAN</button>
+        </div>
+        
+        <!-- SECTION: DASHBOARD (OVERVIEW) -->
+        <div id="section-overview" class="admin-section">
+            <div class="stats-container">
+                <div class="admin-stat-card">
+                    <p>Global Trips</p>
+                    <h3>{{ total_trips }}</h3>
+                </div>
+                <div class="admin-stat-card">
+                    <p>Total Booking</p>
+                    <h3>{{ total_bookings }}</h3>
+                </div>
+                <div class="admin-stat-card">
+                    <p>Occupancy</p>
+                    <h3>{{ booked_seats }}</h3>
+                </div>
+                <div class="admin-stat-card">
+                    <p>Vacant</p>
+                    <h3>{{ vacant_seats }}</h3>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 3rem; margin-top: 3rem;">
+                <div class="chart-box">
+                    <h4>Booking Velocity</h4>
+                    <canvas id="bookingChart" height="200"></canvas>
+                </div>
+                <div class="chart-box">
+                    <h4>Fleet Distribution</h4>
+                    <canvas id="occupancyChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: MANAGE TRIPS -->
+        <div id="section-trips" class="admin-section" style="display: none;">
+            <div class="chart-box">
+                <h4 style="margin-bottom: 2rem;">Global Trip Inventory</h4>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead style="border-bottom: 2px solid rgba(255,255,255,0.1); color: var(--primary);">
+                            <tr>
+                                <th style="padding: 1.5rem;">ID</th>
+                                <th style="padding: 1.5rem;">Destination</th>
+                                <th style="padding: 1.5rem;">Base Price</th>
+                                <th style="padding: 1.5rem;">Capacity</th>
+                                <th style="padding: 1.5rem;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody style="color: rgba(255,255,255,0.7); font-weight: 700;">
+                            {% for trip in all_trips %}
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td style="padding: 1.5rem;">#{{ trip.id }}</td>
+                                <td style="padding: 1.5rem; color: white;">{{ trip.destination }}</td>
+                                <td style="padding: 1.5rem;">₹{{ trip.price }}</td>
+                                <td style="padding: 1.5rem;">{{ trip.total_seats }} Seats</td>
+                                <td style="padding: 1.5rem; display: flex; gap: 0.5rem;">
+                                    <button onclick="editTrip('{{ trip.id }}', '{{ trip.destination|escapejs }}', '{{ trip.price }}', '{{ trip.description|escapejs }}', '{{ trip.image_url|escapejs }}', '{{ trip.total_seats }}', '{{ trip.start_date|date:"Y-m-d" }}')" class="btn btn-outline" style="padding: 0.5rem 1rem; font-size: 0.7rem; border-color: #00BFA6; color: #00BFA6;">EDIT</button>
+                                    <button onclick="prepareHotel('{{ trip.id }}', '{{ trip.destination|escapejs }}')" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.7rem;">+ HOTEL</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: HOTELS -->
+        <div id="section-hotels" class="admin-section" style="display: none;">
+            <div style="display: grid; grid-template-columns: 1fr 350px; gap: 2rem;">
+                <div class="chart-box">
+                    <h4 style="margin-bottom: 2rem;">Hospitality Ledger (Global)</h4>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                            <thead style="border-bottom: 2px solid rgba(255,255,255,0.1); color: var(--primary);">
+                                <tr>
+                                    <th style="padding: 1rem;">Hotel Name</th>
+                                    <th style="padding: 1rem;">Trip Destination</th>
+                                    <th style="padding: 1rem;">Type</th>
+                                    <th style="padding: 1rem;">Price/Night</th>
+                                </tr>
+                            </thead>
+                            <tbody style="color: rgba(255,255,255,0.6); font-weight: 600; font-size: 0.85rem;">
+                                {% for hotel in all_hotels %}
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 1.2rem; color: white;">{{ hotel.name }}</td>
+                                    <td style="padding: 1.2rem;">{{ hotel.trip.destination }}</td>
+                                    <td style="padding: 1.2rem;">
+                                        <span style="color: {% if hotel.hotel_type == 'premium' %}#FFD700{% else %}#00BFA6{% endif %}; font-weight: 800;">
+                                            {{ hotel.get_hotel_type_display|upper }}
+                                        </span>
+                                    </td>
+                                    <td style="padding: 1.2rem;">₹{{ hotel.price_per_night }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="chart-box" id="hotel-form-box">
+                    <h4 style="margin-bottom: 2rem; color: var(--primary);">Add Property</h4>
+                    <form action="{% url 'dashboard:index' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add_hotel">
+                        <input type="hidden" name="trip_id" id="hotel_trip_id">
+                        
+                        <p style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 1rem;" id="hotel_target_info">Select a trip from 'Manage Trips' to bind a hotel.</p>
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <label style="font-size: 0.7rem; font-weight: 900; color: white;">HOTEL NAME</label>
+                            <input type="text" name="name" class="custom-input" required style="width: 100%; margin-top: 0.5rem; background: rgba(255,255,255,0.05);">
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label style="font-size: 0.7rem; font-weight: 900; color: white;">TIER</label>
+                            <select name="hotel_type" class="custom-input" style="width: 100%; margin-top: 0.5rem; background: rgba(255,255,255,0.05);">
+                                <option value="standard">Standard (Normal)</option>
+                                <option value="premium">Premium (Luxury)</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label style="font-size: 0.7rem; font-weight: 900; color: white;">PRICE PER NIGHT</label>
+                            <input type="number" name="price_per_night" class="custom-input" required style="width: 100%; margin-top: 0.5rem; background: rgba(255,255,255,0.05);">
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label style="font-size: 0.7rem; font-weight: 900; color: white;">LOCATION / NEARBY</label>
+                            <input type="text" name="location" class="custom-input" required style="width: 100%; margin-top: 0.5rem; background: rgba(255,255,255,0.05);">
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="font-size: 0.7rem; font-weight: 900; color: white;">AMENITIES</label>
+                            <textarea name="description" class="custom-input" rows="3" style="width: 100%; margin-top: 0.5rem; background: rgba(255,255,255,0.05);"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem;">DEPLOY PROPERTY</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: BOOKINGS -->
+        <div id="section-bookings" class="admin-section" style="display: none;">
+            <div class="chart-box">
+                <h4 style="margin-bottom: 2rem;">Global Booking Ledger</h4>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead style="border-bottom: 2px solid rgba(255,255,255,0.1); color: var(--primary);">
+                            <tr>
+                                <th style="padding: 1.5rem;">ID</th>
+                                <th style="padding: 1.5rem;">Customer</th>
+                                <th style="padding: 1.5rem;">Trip</th>
+                                <th style="padding: 1.5rem;">Seats</th>
+                                <th style="padding: 1.5rem;">Total</th>
+                                <th style="padding: 1.5rem;">Status</th>
+                                <th style="padding: 1.5rem;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody style="color: rgba(255,255,255,0.7); font-weight: 700;">
+                            {% for booking in all_bookings %}
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td style="padding: 1.5rem;">#{{ booking.id }}</td>
+                                <td style="padding: 1.5rem; color: white;">{{ booking.user.name }}<br><small style="color:rgba(255,255,255,0.4)">{{ booking.user.email }}</small></td>
+                                <td style="padding: 1.5rem;">{{ booking.trip.destination }}</td>
+                                <td style="padding: 1.5rem;">{{ booking.seats_booked }}</td>
+                                <td style="padding: 1.5rem;">₹{{ booking.total_price }}</td>
+                                <td style="padding: 1.5rem;">
+                                    <span style="padding: 0.4rem 1rem; border-radius: 99px; font-size: 0.7rem; background: 
+                                        {% if booking.status == 'confirmed' %}rgba(0,191,166,0.1){% elif booking.status == 'pending_admin' %}rgba(255,193,7,0.1){% else %}rgba(255,142,158,0.1){% endif %};
+                                        color: {% if booking.status == 'confirmed' %}#00BFA6{% elif booking.status == 'pending_admin' %}#FFC107{% else %}#FF8E9E{% endif %};">
+                                        {{ booking.get_status_display|upper }}
+                                    </span>
+                                </td>
+                                <td style="padding: 1.5rem;">
+                                    {% if booking.status == 'pending_admin' or booking.status == 'payment_confirmed' %}
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <form method="POST" action="{% url 'dashboard:index' %}" style="margin:0;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="confirm_booking">
+                                            <input type="hidden" name="booking_id" value="{{ booking.id }}">
+                                            <button type="submit" class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.6rem;">APPROVE</button>
+                                        </form>
+                                        <form method="POST" action="{% url 'dashboard:index' %}" style="margin:0;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="reject_booking">
+                                            <input type="hidden" name="booking_id" value="{{ booking.id }}">
+                                            <button type="submit" class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.6rem; border-color: #FF8E9E; color: #FF8E9E;">REJECT</button>
+                                        </form>
+                                    </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="7" style="padding: 3rem; text-align: center; color: rgba(255,255,255,0.3);">No bookings found.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: CUSTOMERS & PARTNERS -->
+        <div id="section-customers" class="admin-section" style="display: none;">
+            <!-- Partner Hub -->
+            <div style="display: grid; grid-template-columns: 1fr 350px; gap: 2rem; margin-bottom: 3rem;">
+                <div class="chart-box" style="padding: 2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h4 style="margin: 0; color: var(--primary);">Partner Ecosystem</h4>
+                        <span style="font-size: 0.7rem; color: rgba(255,255,255,0.4);">ACTIVE ALLIANCES</span>
+                    </div>
+
+                    <!-- Row 1: Hotel Partners -->
+                    <div style="margin-bottom: 2rem;">
+                        <p style="font-size: 0.65rem; font-weight: 900; color: #FFD700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 1rem;">Hotel Partners</p>
+                        <div style="display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 1rem; scrollbar-width: none;">
+                            {% for partner in hotel_partners %}
+                            <div style="min-width: 180px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 1rem; padding: 1.5rem 1rem; text-align: center; position: relative; transition: 0.3s;" class="partner-card">
+                                <form method="POST" action="{% url 'dashboard:index' %}" style="position: absolute; top: 0.5rem; right: 0.5rem;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="remove_partner">
+                                    <input type="hidden" name="partner_id" value="{{ partner.id }}">
+                                    <button type="submit" style="background: none; border: none; color: #FF8E9E; cursor: pointer; font-size: 0.8rem; opacity: 0.3; transition: 0.3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.3">
+                                        <i class="fas fa-times-circle"></i>
+                                    </button>
+                                </form>
+                                <div style="width: 50px; height: 50px; background: var(--primary); border-radius: 12px; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--secondary);">
+                                    <i class="fas fa-hotel"></i>
+                                </div>
+                                <h5 style="color: white; margin: 0; font-size: 0.85rem; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ partner.name }}</h5>
+                                <p style="font-size: 0.7rem; color: rgba(255,255,255,0.4); margin-top: 0.4rem; font-weight: 600;">{{ partner.location }}</p>
+                            </div>
+                            {% empty %}
+                            <p style="color: rgba(255,255,255,0.2); font-size: 0.8rem;">No hotel partners registered.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Travel Partners -->
+                    <div>
+                        <p style="font-size: 0.65rem; font-weight: 900; color: #00BFA6; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 1rem;">Travel Partners</p>
+                        <div style="display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 1rem; scrollbar-width: none;">
+                            {% for partner in travel_partners %}
+                            <div style="min-width: 180px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 1rem; padding: 1.5rem 1rem; text-align: center; position: relative; transition: 0.3s;" class="partner-card">
+                                <form method="POST" action="{% url 'dashboard:index' %}" style="position: absolute; top: 0.5rem; right: 0.5rem;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="remove_partner">
+                                    <input type="hidden" name="partner_id" value="{{ partner.id }}">
+                                    <button type="submit" style="background: none; border: none; color: #FF8E9E; cursor: pointer; font-size: 0.8rem; opacity: 0.3; transition: 0.3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.3">
+                                        <i class="fas fa-times-circle"></i>
+                                    </button>
+                                </form>
+                                <div style="width: 50px; height: 50px; background: #00BFA6; border-radius: 12px; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--secondary);">
+                                    <i class="fas fa-shuttle-van"></i>
+                                </div>
+                                <h5 style="color: white; margin: 0; font-size: 0.85rem; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ partner.name }}</h5>
+                                <p style="font-size: 0.7rem; color: rgba(255,255,255,0.4); margin-top: 0.4rem; font-weight: 600;">{{ partner.location }}</p>
+                            </div>
+                            {% empty %}
+                            <p style="color: rgba(255,255,255,0.2); font-size: 0.8rem;">No travel partners registered.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Partner Form -->
+                <div class="chart-box" style="padding: 2rem;">
+                    <h4 style="margin-bottom: 1.5rem; color: var(--primary); font-size: 1.1rem;">Onboard Partner</h4>
+                    <form method="POST" action="{% url 'dashboard:index' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add_partner">
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <label style="font-size: 0.65rem; font-weight: 900; color: white;">PARTNER CATEGORY</label>
+                            <select name="category" class="custom-input" style="width: 100%; height: 3rem; background: rgba(255,255,255,0.05); margin-top: 0.5rem; color: white;">
+                                <option value="hotel">Hotel Partner</option>
+                                <option value="travel">Travel Partner</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label style="font-size: 0.65rem; font-weight: 900; color: white;">ENTITY NAME</label>
+                            <input type="text" name="name" class="custom-input" required placeholder="e.g. Grand Hyatt" style="width: 100%; height: 3rem; background: rgba(255,255,255,0.05); margin-top: 0.5rem; color: white;">
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="font-size: 0.65rem; font-weight: 900; color: white;">PRIMARY LOCATION</label>
+                            <input type="text" name="location" class="custom-input" required placeholder="e.g. Goa, India" style="width: 100%; height: 3rem; background: rgba(255,255,255,0.05); margin-top: 0.5rem; color: white;">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; border-radius: 12px; font-weight: 800;">FINALIZE ALLIANCE</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="chart-box">
+                <h4 style="margin-bottom: 2rem;">Authorized Customer Base</h4>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead style="border-bottom: 2px solid rgba(255,255,255,0.1); color: var(--primary);">
+                            <tr>
+                                <th style="padding: 1.5rem;">ID</th>
+                                <th style="padding: 1.5rem;">Full Name</th>
+                                <th style="padding: 1.5rem;">Email Address</th>
+                                <th style="padding: 1.5rem;">Phone</th>
+                                <th style="padding: 1.5rem;">Joined Date</th>
+                            </tr>
+                        </thead>
+                        <tbody style="color: rgba(255,255,255,0.7); font-weight: 700;">
+                            {% for customer in all_customers %}
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td style="padding: 1.5rem;">#{{ customer.id }}</td>
+                                <td style="padding: 1.5rem; color: white;">{{ customer.name }}</td>
+                                <td style="padding: 1.5rem;">{{ customer.email }}</td>
+                                <td style="padding: 1.5rem;">{{ customer.phone }}</td>
+                                <td style="padding: 1.5rem;">{{ customer.date_joined|date:"M d, Y" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" style="padding: 3rem; text-align: center; color: rgba(255,255,255,0.3);">No customers registered yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-add-trip" class="admin-section" style="display: none;">
+            <div class="chart-box" style="max-width: 800px; margin: 0 auto;">
+                <h4 id="trip-form-title" style="margin-bottom: 2rem;">Deploy New Journey</h4>
+                <form action="{% url 'dashboard:index' %}" method="POST" class="add-trip-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" id="trip_form_action" value="add_trip">
+                    <input type="hidden" name="trip_id" id="edit_trip_id">
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <label style="display: block; font-size: 0.8rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem;">DESTINATION</label>
+                            <input type="text" id="form_destination" name="destination" class="custom-input" placeholder="e.g. Kyoto Temple Trail" required style="width: 100%; background: rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.1); color: white; padding: 1rem; border-radius: 1rem;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.8rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem;">BASE PRICE (₹)</label>
+                            <input type="number" id="form_price" name="price" class="custom-input" placeholder="0" required style="width: 100%; background: rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.1); color: white; padding: 1rem; border-radius: 1rem;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; font-size: 0.8rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem;">STORY DESCRIPTION</label>
+                        <textarea id="form_description" name="description" class="custom-input" rows="4" placeholder="Craft a cinematic journey description..." required style="width: 100%; background: rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.1); color: white; padding: 1rem; border-radius: 1rem;"></textarea>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <label style="display: block; font-size: 0.8rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem;">JOURNEY START DATE</label>
+                            <input type="date" id="form_start_date" name="start_date" class="custom-input" required style="width: 100%; background: rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.1); color: white; padding: 1rem; border-radius: 1rem;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.8rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem;">TOTAL CAPACITY</label>
+                            <input type="number" id="form_total_seats" name="total_seats" class="custom-input" value="40" required style="width: 100%; background: rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.1); color: white; padding: 1rem; border-radius: 1rem;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 2rem;">
+                        <label style="display: block; font-size: 0.8rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem;">IMAGE URL (H-RES)</label>
+                        <input type="url" id="form_image_url" name="image_url" class="custom-input" placeholder="https://unsplash..." required style="width: 100%; background: rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.1); color: white; padding: 1rem; border-radius: 1rem;">
+                    </div>
+                    <button type="submit" id="trip-submit-btn" class="btn btn-primary" style="width: 100%; padding: 1.5rem; font-weight: 950; border-radius: 99px;">AUTHORIZE & DEPLOY PLAN</button>
+                    <button type="button" onclick="showSection('overview')" class="btn btn-outline" style="width: 100%; margin-top: 1rem; padding: 1rem; border-radius: 99px;">CANCEL</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    Chart.defaults.color = 'rgba(255,255,255,0.4)';
+    Chart.defaults.font.family = "'Inter', sans-serif";
+
+    function showSection(sectionId) {
+        // Reset forms if leaving add-trip
+        if (sectionId !== 'add-trip') {
+            document.getElementById('trip_form_action').value = 'add_trip';
+            document.getElementById('trip-form-title').innerText = 'Deploy New Journey';
+            document.getElementById('trip-submit-btn').innerText = 'AUTHORIZE & DEPLOY PLAN';
+            // Reset fields
+            document.getElementById('form_destination').value = '';
+            document.getElementById('form_price').value = '';
+            document.getElementById('form_description').value = '';
+            document.getElementById('form_image_url').value = '';
+            document.getElementById('form_total_seats').value = '40';
+        }
+
+        // Toggle Active Sections
+        document.querySelectorAll('.admin-section').forEach(s => s.style.display = 'none');
+        document.getElementById('section-' + sectionId).style.display = 'block';
+        
+        // Update Sidebar Active State
+        document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+        const linkMap = {
+            'overview': 0, 'trips': 1, 'bookings': 2, 'customers': 3, 'hotels': 4
+        };
+        const links = document.querySelectorAll('.sidebar-link');
+        if(linkMap[sectionId] !== undefined) links[linkMap[sectionId]].classList.add('active');
+
+        const titles = {
+            'overview': 'Operational Alpha',
+            'trips': 'Global Inventory',
+            'bookings': 'Booking Ledger',
+            'customers': 'Customer Base',
+            'hotels': 'Hospitality Hub',
+            'add-trip': 'Mission Configuration'
+        };
+        document.getElementById('main-title').innerText = titles[sectionId] || 'Command Center';
+    }
+
+    function editTrip(id, dest, price, desc, img, seats, date) {
+        showSection('add-trip');
+        document.getElementById('trip-form-title').innerText = 'Reconfigure Mission: ' + dest;
+        document.getElementById('trip_form_action').value = 'edit_trip';
+        document.getElementById('edit_trip_id').value = id;
+        document.getElementById('trip-submit-btn').innerText = 'SAVE MODIFICATIONS';
+        
+        document.getElementById('form_destination').value = dest;
+        document.getElementById('form_price').value = price;
+        document.getElementById('form_description').value = desc;
+        document.getElementById('form_image_url').value = img;
+        document.getElementById('form_total_seats').value = seats;
+        document.getElementById('form_start_date').value = date;
+    }
+
+    function prepareHotel(tripId, tripName) {
+        showSection('hotels');
+        document.getElementById('hotel_trip_id').value = tripId;
+        document.getElementById('hotel_target_info').innerHTML = 'Linking property to: <span style="color:white; font-weight:900;">' + tripName + '</span>';
+        document.getElementById('hotel-form-box').style.borderColor = 'var(--primary)';
+    }
+
+    // Occupancy Chart
+    const ctx1 = document.getElementById('occupancyChart').getContext('2d');
+    new Chart(ctx1, {
+        type: 'doughnut',
+        data: {
+            labels: ['Occupied', 'Vacant'],
+            datasets: [{
+                data: [{{ booked_seats|default:30 }}, {{ vacant_seats|default:70 }}],
+                backgroundColor: ['#00BFA6', 'rgba(255,255,255,0.05)'],
+                borderWidth: 0,
+                hoverOffset: 20
+            }]
+        },
+        options: {
+            cutout: '80%',
+            plugins: {
+                legend: { position: 'bottom', labels: { padding: 30, usePointStyle: true } }
+            }
+        }
+    });
+
+    // Velocity Chart
+    const ctx2 = document.getElementById('bookingChart').getContext('2d');
+    new Chart(ctx2, {
+        type: 'line',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Reservations',
+                data: [15, 25, 18, 45, 30, 55, 60],
+                borderColor: '#00BFA6',
+                backgroundColor: 'rgba(0, 191, 166, 0.1)',
+                fill: true,
+                tension: 0.4,
+                pointRadius: 6,
+                pointBackgroundColor: '#00BFA6'
+            }]
+        },
+        options: {
+            scales: {
+                y: { grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,14 @@
+*.pyc
+*~
+__pycache__
+.env
+db.sqlite3
+/media
+/staticfiles
+.gemini
+/brain
+/artifacts
+/scratch
+.idea
+.vscode
+*.log

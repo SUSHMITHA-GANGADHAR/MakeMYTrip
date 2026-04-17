@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Bookings | MakeMyTrip{% endblock %}
+
+{% block content %}
+<div style="margin-top: 3rem;">
+    <h1 style="margin-bottom: 2rem;">Manage Customer Bookings</h1>
+    
+    <div class="glass-card" style="padding: 2rem; overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; color: var(--text);">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--glass-border); text-align: left;">
+                    <th style="padding: 1rem;">Customer</th>
+                    <th style="padding: 1rem;">Trip</th>
+                    <th style="padding: 1rem;">Seats</th>
+                    <th style="padding: 1rem;">Status</th>
+                    <th style="padding: 1rem;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr style="border-bottom: 1px solid var(--glass-border);">
+                    <td style="padding: 1.5rem;">
+                        <strong>{{ booking.user.name }}</strong><br>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">{{ booking.user.email }}</span>
+                    </td>
+                    <td style="padding: 1.5rem;">{{ booking.trip.destination }}</td>
+                    <td style="padding: 1.5rem;">{{ booking.seats_booked }}</td>
+                    <td style="padding: 1.5rem;">
+                        <span style="padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; background: {% if booking.status == 'confirmed' %}rgba(0,191,166,0.1){% else %}rgba(244,63,94,0.1){% endif %}; color: {% if booking.status == 'confirmed' %}#00BFA6{% else %}#f43f5e{% endif %};">
+                            {{ booking.status|upper }}
+                        </span>
+                    </td>
+                    <td style="padding: 1.5rem;">
+                        {% if booking.status == 'pending' %}
+                            <a href="{% url 'dashboard:booking_action' booking.id 'confirm' %}" class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Confirm</a>
+                            <a href="{% url 'dashboard:booking_action' booking.id 'reject' %}" class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; color: #f43f5e;">Reject</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" style="padding: 2rem; text-align: center; color: var(--text-muted);">No bookings found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

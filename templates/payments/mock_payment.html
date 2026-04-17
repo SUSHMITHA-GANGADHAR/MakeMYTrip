@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Demo Payment | MakeMyTrip{% endblock %}
+
+{% block content %}
+<div class="glass-card" style="max-width: 500px; margin: 6rem auto; padding: 3rem; text-align: center;">
+    <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); padding: 1rem; border-radius: 0.5rem; margin-bottom: 2rem; color: #fbbf24; font-size: 0.9rem;">
+        <i class="fas fa-exclamation-triangle"></i> Development Mode: No Razorpay API Key found.
+    </div>
+    
+    <h2 style="margin-bottom: 1.5rem;">Secure Payment (Demo)</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2.5rem;">You are booking <strong>{{ booking.trip.destination }}</strong> for <strong>₹{{ booking.total_price }}</strong>.</p>
+    
+    <a href="{% url 'mock_payment_success' booking.id %}" class="btn btn-primary" style="width: 100%; padding: 1rem;">Simulate Successful Payment</a>
+    
+    <p style="margin-top: 1.5rem; font-size: 0.85rem; color: var(--text-muted);">This is a mock screen for testing the workflow without an API key.</p>
+</div>
+{% endblock %}

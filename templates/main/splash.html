@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Welcome - Make My Trip{% endblock %}
+
+{% block nav %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background: #0A2540;
+    }
+    
+    .splash-overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: url('https://images.unsplash.com/photo-1436491865332-7a61a109ec05?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') no-repeat center center/cover;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        z-index: 9999;
+        cursor: pointer;
+        transition: transform 1.5s cubic-bezier(0.7, 0, 0.3, 1);
+    }
+
+    .airplane-logo {
+        width: 300px;
+        filter: drop-shadow(0 0 30px rgba(0, 191, 166, 0.6));
+        transition: 1s cubic-bezier(0.7, 0, 0.3, 1);
+    }
+
+    .splash-text {
+        color: white;
+        margin-top: 2rem;
+        font-family: 'Outfit', sans-serif;
+        text-align: center;
+        opacity: 0;
+        animation: fadeIn 2s forwards 0.5s;
+    }
+
+    .splash-text h2 {
+        font-size: 3rem;
+        letter-spacing: 15px;
+        margin-bottom: 0.5rem;
+    }
+
+    .splash-text p {
+        letter-spacing: 5px;
+        font-weight: 300;
+        color: var(--primary);
+    }
+
+    /* Takeoff Animation Class */
+    .takeoff {
+        transform: scale(20) translate(100%, -100%);
+        opacity: 0;
+    }
+
+    @keyframes fadeIn {
+        to { opacity: 1; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="splash-overlay" id="splashScreen" onclick="takeoff()">
+    <img src="https://cdn-icons-png.flaticon.com/512/3125/3125713.png" class="airplane-logo" id="airplane" alt="Airplane">
+    <div class="splash-text">
+        <h2>Make My Trip</h2>
+        <p>TAP TO TAKE OFF</p>
+    </div>
+</div>
+
+<script>
+    function takeoff() {
+        const airplane = document.getElementById('airplane');
+        const splash = document.getElementById('splashScreen');
+        
+        airplane.style.transform = "translate(50vw, -50vh) scale(0.5) rotate(-45deg)";
+        airplane.style.opacity = "0";
+        
+        setTimeout(() => {
+            splash.style.transform = "scale(1.5)";
+            splash.style.opacity = "0";
+        }, 500);
+
+        setTimeout(() => {
+            window.location.href = "{% url 'trips:index' %}";
+        }, 1500);
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Verify OTP | MakeMyTrip{% endblock %}
+
+{% block content %}
+<div class="glass-card auth-container" style="max-width: 400px; margin: 6rem auto; padding: 3rem;">
+    <div class="auth-header" style="text-align: center; margin-bottom: 2rem;">
+        <h2>Verify OTP</h2>
+        <p style="color: var(--text-muted);">Please enter the 6-digit code sent to your email.</p>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group" style="margin-bottom: 2rem;">
+            <input type="text" name="otp" maxlength="6" placeholder="Enter 6-digit OTP" style="width: 100%; padding: 1rem; text-align: center; font-size: 1.5rem; letter-spacing: 12px; background: var(--bg-muted); border: 1px solid var(--glass-border); border-radius: 0.75rem; color: var(--primary); outline: none;">
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Verify & Login</button>
+    </form>
+
+    <div style="text-align: center; margin-top: 2rem;">
+        <p style="font-size: 0.9rem; color: var(--text-muted);">Didn't receive it? <a href="{% url 'accounts:resend_otp' %}" style="color: var(--primary); text-decoration: none;">Resend OTP</a></p>
+    </div>
+</div>
+{% endblock %}

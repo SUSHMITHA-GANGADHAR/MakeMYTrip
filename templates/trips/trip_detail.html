@@ -418,6 +418,14 @@
             });
             const orderData = await response.json();
 
+            if (orderData.status === 'demo_available') {
+                if(confirm("Live Payment Gateway is in Maintenance. Would you like to use the 'Project Presentation Mode' to complete this booking?")) {
+                    const travelersCount = document.getElementById('travelers').value;
+                    completeBookingDirectly(finalAmt, travelersCount);
+                }
+                return;
+            }
+
             if (orderData.status !== 'success') {
                 throw new Error("Could not initiate payment session.");
             }
@@ -433,8 +441,9 @@
                 "order_id": orderData.order_id, 
                 "modal": {
                     "ondismiss": function() {
-                        if(confirm("DEMO MODE: If your test bank is failing, would you like to bypass the gateway and CONFIRM this booking anyway for your project demo?")) {
-                            completeBookingDirectly(finalAmt);
+                        if(confirm("STABILITY MODE: Would you like to bypass the live gateway and CONFIRM this booking now for your presentation?")) {
+                            const travelersCount = document.getElementById('travelers').value;
+                            completeBookingDirectly(finalAmt, travelersCount);
                         }
                     }
                 },
@@ -457,7 +466,7 @@
 
         } catch (e) {
             console.error("Payment Error:", e);
-            if(confirm("Gateway Connectivity Error. Would you like to use the SIMULATED SUCCESS mode for your project presentation?")) {
+            if(confirm("Project Presentation Mode: The live gateway is currently offline. Would you like to proceed with a simulated successful booking?")) {
                 const travelersCount = document.getElementById('travelers').value;
                 completeBookingDirectly(finalAmt, travelersCount);
             }

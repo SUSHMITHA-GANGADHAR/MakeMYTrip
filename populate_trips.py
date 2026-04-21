@@ -23,128 +23,128 @@ def populate():
             "available_seats": 20,
             "image_url": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200",
             "hotels": ["The Ritz Paris"],
-            "nearby": "Eiffel Tower, Louvre"
+            "nearby": "Eiffel Tower, Louvre Museum, Notre-Dame Cathedral, Arc de Triomphe, Seine River Cruise"
         },
         {
             "destination": "Goa - The Party Capital",
             "duration": "4 Days / 3 Nights",
-            "description": "Sun, sand, and serenity. Experience the best of North Goa's nightlife.",
+            "description": "Sun, sand, and serenity. Experience the best of North Goa's nightlife. Visit pristine beaches and historic forts.",
             "price": 8500,
             "total_seats": 100,
             "available_seats": 100,
             "image_url": "https://images.unsplash.com/photo-1512783563744-1921f6690460?w=1200",
             "hotels": ["Taj Exotica"],
-            "nearby": "Baga Beach"
+            "nearby": "Baga Beach, Aguada Fort, Basilica of Bom Jesus, Dudhsagar Falls, Anjuna Flea Market"
         },
         {
             "destination": "Leh Ladakh - Adventure Paradise",
             "duration": "7 Days / 6 Nights",
-            "description": "Journey through the land of high passes. Visit Pangong Lake and Nubra Valley.",
+            "description": "Journey through the land of high passes. Visit Pangong Lake, Nubra Valley, and the highest moterable road.",
             "price": 32000,
             "total_seats": 40,
             "available_seats": 40,
             "image_url": "https://images.unsplash.com/photo-1581791534721-e5993446d788?w=1200",
             "hotels": ["The Grand Dragon"],
-            "nearby": "Pangong Lake"
+            "nearby": "Pangong Lake, Nubra Valley, Khardung La Pass, Shanti Stupa, Magnetic Hill"
         },
         {
             "destination": "Kerala - God's Own Country",
             "duration": "5 Days / 4 Nights",
-            "description": "Paradise of backwaters and lush greenery. Stay on a houseboat in Alleppey.",
+            "description": "Paradise of backwaters and lush greenery. Stay on a luxury houseboat in Alleppey and explore coffee estates.",
             "price": 18500,
             "total_seats": 50,
             "available_seats": 50,
             "image_url": "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1200",
             "hotels": ["Zuri Kumarakom"],
-            "nearby": "Alleppey"
+            "nearby": "Alleppey Backwaters, Munnar Tea Gardens, Periyar National Park, Fort Kochi, Varkala Beach"
         },
         {
             "destination": "Luxury Sleeper: Bangalore to Mumbai",
             "duration": "1 Night / 1 Day",
-            "description": "Travel in the most premium sleeper bus with personal screens and fully flat beds.",
+            "description": "Travel in the most premium sleeper bus with personal screens and fully flat beds. Experience transit luxury.",
             "price": 3500,
             "total_seats": 30,
             "available_seats": 30,
             "image_url": "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=1200",
             "hotels": [],
-            "nearby": "Western Ghats"
+            "nearby": "Cubbon Park, Gateway of India, Marine Drive, Bannerghatta Park, Haji Ali Dargah"
         },
         {
             "destination": "Spiritual South: Meenakshi & Madurai",
             "duration": "5 Days / 4 Nights",
-            "description": "A deep dive into the Dravidian architecture of Tamil Nadu. Visit the ancient Meenakshi Temple.",
+            "description": "A deep dive into the Dravidian architecture of Tamil Nadu. Visit the ancient and colorful Meenakshi Temple.",
             "price": 22000,
             "total_seats": 50,
             "available_seats": 50,
             "image_url": "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=1200",
             "hotels": ["Heritage Madurai"],
-            "nearby": "Meenakshi Amman Temple"
+            "nearby": "Meenakshi Amman Temple, Thirumalai Nayakkar Mahal, Gandhi Museum, Koodal Azhagar Temple, Mariamman Teppakulam"
         },
         {
             "destination": "Puri Jagannath Temple",
             "duration": "3 Days / 2 Nights",
-            "description": "Visit the world-famous Jagannath Temple, one of the Char Dham pilgrimage sites.",
+            "description": "Visit the world-famous Jagannath Temple, one of the Char Dham pilgrimage sites, located right by the sea.",
             "price": 19500,
             "total_seats": 40,
             "available_seats": 40,
             "image_url": "https://images.unsplash.com/photo-1594991471329-87a710207399?w=1200",
             "hotels": ["Sterling Puri"],
-            "nearby": "Jagannath Temple"
+            "nearby": "Jagannath Temple, Golden Beach, Konark Sun Temple, Chilika Lake, Raghurajpur Village"
         },
         {
             "destination": "Varanasi - The Eternal City",
             "duration": "3 Days / 2 Nights",
-            "description": "Witness the world-famous Ganga Aarti and explore the narrow lanes of the oldest city.",
+            "description": "Witness the world-famous Ganga Aarti and explore the narrow, ancient lanes of the world's oldest city.",
             "price": 15000,
             "total_seats": 30,
             "available_seats": 30,
             "image_url": "https://images.unsplash.com/photo-1561359313-0639aad49ca6?w=1200",
             "hotels": ["Brijrama Palace"],
-            "nearby": "Ganga Aarti"
+            "nearby": "Kashi Vishwanath Temple, Dashashwamedh Ghat, Manikarnika Ghat, Sarnath, Ramnagar Fort"
         },
         {
             "destination": "Golden Temple - Amritsar Divine",
             "duration": "3 Days / 2 Nights",
-            "description": "Visit the holiest shrine of Sikhism and witness the Wagah border ceremony.",
+            "description": "Visit the holiest shrine of Sikhism and witness the emotional Wagah border retreat ceremony.",
             "price": 12000,
             "total_seats": 100,
             "available_seats": 100,
             "image_url": "https://images.unsplash.com/photo-1514222139-b576bb5ce007?w=1200",
             "hotels": ["Hyatt Amritsar"],
-            "nearby": "Golden Temple"
+            "nearby": "Golden Temple, Jallianwala Bagh, Wagah Border, Partition Museum, Gobindgarh Fort"
         },
         {
             "destination": "Hampi - Ruins of Vijayanagara",
             "duration": "4 Days / 3 Nights",
-            "description": "A journey back in time to the capital of the Vijayanagara Empire.",
+            "description": "A journey back in time to the majestic capital of the Vijayanagara Empire. Explore boulders and ruins.",
             "price": 16000,
             "total_seats": 25,
             "available_seats": 25,
             "image_url": "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=1200",
             "hotels": ["Evolve Back Hampi"],
-            "nearby": "Stone Chariot"
+            "nearby": "Virupaksha Temple, Vitthala Temple, Hampi Bazaar, Lotus Mahal, Matanga Hill"
         },
         {
             "destination": "Konark - The Sun Temple",
             "duration": "3 Days / 2 Nights",
-            "description": "Behold the 13th-century Sun Temple designed as a colossal chariot.",
+            "description": "Behold the 13th-century Sun Temple designed as a colossal chariot. A UNESCO World Heritage site.",
             "price": 14000,
             "total_seats": 30,
             "available_seats": 30,
             "image_url": "https://images.unsplash.com/photo-1590050752117-23a9d7f6e39e?w=1200",
             "hotels": ["Mayfair Heritage"],
-            "nearby": "Sun Temple"
+            "nearby": "Sun Temple, Chandrabhaga Beach, Ramachandi Temple, Konark Museum, Kuruma Site"
         },
         {
             "destination": "Rishikesh - Yoga & Divine Ganges",
             "duration": "5 Days / 4 Nights",
-            "description": "Experience the spiritual energy of the Himalayas and the divine Ganges.",
+            "description": "Experience the spiritual energy of the Himalayas. Perfect for river rafting and meditation retreats.",
             "price": 17500,
             "total_seats": 35,
             "available_seats": 35,
             "image_url": "https://images.unsplash.com/photo-1544735745-b89b57c61dfd?w=1200",
             "hotels": ["Taj Rishikesh"],
-            "nearby": "Beatles Ashram"
+            "nearby": "Laxman Jhula, Parmarth Niketan, Beatles Ashram, Triveni Ghat, Neer Garh Waterfall"
         }
     ]
 

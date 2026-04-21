@@ -63,7 +63,7 @@ class Partner(models.Model):
     )
     name = models.CharField(max_length=255)
     category = models.CharField(max_length=20, choices=PARTNER_TYPES)
-    image_url = models.URLField(blank=True, null=True)
+    image_url = models.URLField(max_length=500, blank=True, null=True)
     location = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

@@ -298,10 +298,10 @@
             {% for trip in top_trips|slice:":3" %}
             <div class="trip-card reveal">
                 <div class="trip-image">
-                    {% if trip.image %}
-                        <img src="{{ trip.image.url }}" alt="{{ trip.destination }}">
-                    {% elif trip.image_url %}
+                    {% if trip.image_url %}
                         <img src="{{ trip.image_url }}" alt="{{ trip.destination }}">
+                    {% elif trip.image %}
+                        <img src="{{ trip.image.url }}" alt="{{ trip.destination }}">
                     {% else %}
                         <img src="https://images.unsplash.com/photo-1548013146-72479768bbaa?w=800" alt="Destination">
                     {% endif %}

@@ -190,7 +190,7 @@
         <!-- Left: Info -->
         <div style="display: flex; flex-direction: column;">
             <h1 style="font-size: 4rem; font-weight: 950; margin-bottom: 2rem;">{{ trip.destination }}</h1>
-            <img src="{% if trip.image %}{{ trip.image.url }}{% elif trip.image_url %}{{ trip.image_url }}{% else %}https://images.unsplash.com/photo-1548013146-72479768bbaa?w=1200{% endif %}"
+            <img src="{% if trip.image_url %}{{ trip.image_url }}{% elif trip.image %}{{ trip.image.url }}{% else %}https://images.unsplash.com/photo-1548013146-72479768bbaa?w=1200{% endif %}"
                 style="width: 100%; height: 500px; border-radius: 3rem; object-fit: cover; box-shadow: 0 30px 60px rgba(0,0,0,0.5);">
 
             <div style="margin-top: 4rem;">

@@ -119,7 +119,7 @@
                 {% for trip in available_trips %}
                 <div class="glass-card trip-card" data-title="{{ trip.destination|lower }}" style="display: flex; flex-direction: column; min-height: 480px;">
                     <div style="height: 220px; position: relative; flex-shrink: 0;">
-                        <img src="{% if trip.image %}{{ trip.image.url }}{% elif trip.image_url %}{{ trip.image_url }}{% else %}https://images.unsplash.com/photo-1548013146-72479768bbaa?w=800{% endif %}" style="width: 100%; height: 100%; object-fit: cover;">
+                        <img src="{% if trip.image_url %}{{ trip.image_url }}{% elif trip.image %}{{ trip.image.url }}{% else %}https://images.unsplash.com/photo-1548013146-72479768bbaa?w=1200{% endif %}" style="width: 100%; height: 100%; object-fit: cover;">
                         <div class="price-tag">₹{{ trip.price }}</div>
                     </div>
                     <div style="padding: 2rem; flex: 1; display: flex; flex-direction: column;">

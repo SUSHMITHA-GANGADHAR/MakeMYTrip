@@ -104,7 +104,7 @@
         {% for trip in trips %}
         <div class="trip-card" style="display: flex; flex-direction: column; min-height: 520px; background: rgba(15, 23, 42, 0.4);">
             <div class="trip-image" style="position: relative;">
-                <img src="{% if trip.image %}{{ trip.image.url }}{% elif trip.image_url %}{{ trip.image_url }}{% else %}https://images.unsplash.com/photo-1548013146-72479768bbaa?w=800{% endif %}" alt="{{ trip.destination }}" class="trip-img">
+                <img src="{% if trip.image_url %}{{ trip.image_url }}{% elif trip.image %}{{ trip.image.url }}{% else %}https://images.unsplash.com/photo-1548013146-72479768bbaa?w=800{% endif %}" alt="{{ trip.destination }}" class="trip-img">
                 <div class="price-tag" style="position: absolute; top: 1rem; right: 1rem; background: var(--primary); padding: 0.5rem 1rem; border-radius: 5px; font-weight: bold;">₹{{ trip.price }}</div>
             </div>
             <div class="trip-body" style="flex: 1; display: flex; flex-direction: column;">

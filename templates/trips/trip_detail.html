@@ -484,8 +484,8 @@
             body: JSON.stringify({ trip_id, seats, total_price })
         }).then(res => res.json()).then(data => {
             if(data.status === 'success') {
-                alert("Booking Confirmed Successfully (Verified Offline)!");
-                window.location.href = "{% url 'dashboard:customer_dashboard' %}";
+                alert("Payment Successful! Generating your Digital Ticket...");
+                window.location.href = `/dashboard/invoice/${data.booking_id}/`;
             } else {
                 alert("Processing Error: " + (data.message || "Please check inventory."));
                 if(payBtn) {

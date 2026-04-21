@@ -165,7 +165,7 @@
                                 <i class="fas fa-shield-alt" style="color: #34d399;"></i> Secured with SSL Payment
                             </div>
                             <div style="margin-left: auto; display: flex; gap: 1rem;">
-                                <a href="{% url 'dashboard:view_invoice' booking.id %}" class="btn btn-primary" style="font-size: 0.7rem; padding: 0.6rem 2rem; border-radius: 99px;">VIEW TICKET</a>
+                                <a href="{% url 'dashboard:view_invoice' booking.id %}" class="btn btn-primary" style="font-size: 0.7rem; padding: 0.6rem 2rem; border-radius: 99px;">VIEW BILL & RECEIPT</a>
                                 {% if booking.status == 'pending_admin' or booking.status == 'confirmed' %}
                                 <form action="{% url 'bookings:cancel_booking' booking.id %}" method="POST">
                                     {% csrf_token %}
@@ -196,6 +196,10 @@
                             <span style="font-size: 0.7rem; font-weight: 950; color: {% if booking.status == 'confirmed' %}#34d399{% else %}#ff8e9e{% endif %}; border: 1px solid rgba(255,255,255,0.2); padding: 0.3rem 0.8rem; border-radius: 99px; background: rgba(255,255,255,0.05);">
                                 {% if booking.status == 'confirmed' %}COMPLETED{% else %}{{ booking.get_status_display|upper }}{% endif %}
                             </span>
+                            <div style="margin-top: 1rem; display: flex; gap: 0.5rem; justify-content: flex-end;">
+                                <a href="{% url 'dashboard:view_invoice' booking.id %}" class="btn btn-outline" style="font-size: 0.6rem; padding: 0.4rem 1rem; color: #34d399; border-color: #34d399;">VIEW BILL</a>
+                                <a href="{% url 'dashboard:view_invoice' booking.id %}" class="btn btn-primary" style="font-size: 0.6rem; padding: 0.4rem 1rem;">DOWNLOAD</a>
+                            </div>
                             {% if booking.refund_amount > 0 %}
                             <p style="font-size: 0.8rem; font-weight: 900; color: #34d399; margin-top: 0.5rem; text-shadow: 0 0 10px rgba(52, 211, 153, 0.3);">REFUNDED: ₹{{ booking.refund_amount }}</p>
                             {% endif %}

@@ -164,12 +164,15 @@
                             <div style="font-weight: 800; font-size: 0.85rem;">
                                 <i class="fas fa-shield-alt" style="color: #34d399;"></i> Secured with SSL Payment
                             </div>
-                            {% if booking.status == 'pending_admin' or booking.status == 'confirmed' %}
-                            <form action="{% url 'bookings:cancel_booking' booking.id %}" method="POST" style="margin-left: auto;">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-outline" style="border-color: #fb7185; color: #fb7185; font-size: 0.7rem; padding: 0.6rem 1.5rem;">TERMINATE RESERVATION</button>
-                            </form>
-                            {% endif %}
+                            <div style="margin-left: auto; display: flex; gap: 1rem;">
+                                <a href="{% url 'dashboard:view_invoice' booking.id %}" class="btn btn-primary" style="font-size: 0.7rem; padding: 0.6rem 2rem; border-radius: 99px;">VIEW TICKET</a>
+                                {% if booking.status == 'pending_admin' or booking.status == 'confirmed' %}
+                                <form action="{% url 'bookings:cancel_booking' booking.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline" style="border-color: #fb7185; color: #fb7185; font-size: 0.7rem; padding: 0.6rem 1.5rem;">TERMINATE RESERVATION</button>
+                                </form>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -144,3 +144,12 @@ def customer_dashboard(request):
         'has_bookings': all_user_bookings.exists(),
     }
     return render(request, 'dashboard/customer_dashboard.html', context)
+
+@login_required
+def view_invoice(request, booking_id):
+    booking = Booking.objects.get(id=booking_id)
+    # Security check: Only the owner or admin can view
+    if booking.user != request.user and request.user.role != 'admin':
+        return redirect('dashboard:customer_dashboard')
+    
+    return render(request, 'dashboard/invoice.html', {'booking': booking})

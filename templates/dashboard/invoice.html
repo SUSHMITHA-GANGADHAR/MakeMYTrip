@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block title %}Invoice #{{ booking.id }} | MakeMyTrip{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: #050f1e;
+        color: white;
+    }
+    .invoice-container {
+        max-width: 800px;
+        margin: 4rem auto;
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 2rem;
+        padding: 4rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .invoice-container::before {
+        content: '';
+        position: absolute;
+        top: 0; right: 0;
+        width: 300px; height: 300px;
+        background: radial-gradient(circle, rgba(0, 191, 166, 0.1) 0%, transparent 70%);
+        z-index: -1;
+    }
+    .invoice-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 2rem;
+        margin-bottom: 3rem;
+    }
+    .brand-logo {
+        font-size: 2rem;
+        font-weight: 950;
+        color: white;
+        text-decoration: none;
+    }
+    .brand-logo span { color: var(--primary); }
+    .status-badge {
+        padding: 0.5rem 1.5rem;
+        border-radius: 99px;
+        font-weight: 900;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+    }
+    .status-confirmed { background: rgba(52, 211, 153, 0.2); color: #34d399; }
+    .status-pending { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+    
+    .billing-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
+    .info-label {
+        font-size: 0.7rem;
+        font-weight: 950;
+        color: var(--primary);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0.5rem;
+    }
+    .info-value {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: white;
+    }
+    
+    .price-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 3rem;
+    }
+    .price-table th {
+        text-align: left;
+        padding: 1rem;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.5);
+    }
+    .price-table td {
+        padding: 1.5rem 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .total-row {
+        background: rgba(0, 191, 166, 0.05);
+        font-weight: 950;
+        font-size: 1.5rem;
+    }
+    
+    .footer-note {
+        text-align: center;
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 0.8rem;
+        margin-top: 4rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 2rem;
+    }
+    
+    @media print {
+        .no-print { display: none; }
+        body { background: white; color: black; }
+        .invoice-container { border: none; box-shadow: none; padding: 0; background: white; color: black; }
+        .info-value, .brand-logo { color: black; }
+        .invoice-header { border-bottom: 2px solid #eee; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="no-print" style="margin-top: 2rem; display: flex; gap: 1rem;">
+        <a href="{% url 'dashboard:customer_dashboard' %}" class="btn btn-outline" style="padding: 0.8rem 2rem;">← Back to Dashboard</a>
+        <button onclick="window.print()" class="btn btn-primary" style="padding: 0.8rem 2rem;">Download / Print Ticket</button>
+    </div>
+
+    <div class="invoice-container">
+        <div class="invoice-header">
+            <div class="brand-logo">Make<span>My</span>Trip</div>
+            <div class="status-badge {% if booking.status == 'confirmed' %}status-confirmed{% else %}status-pending{% endif %}">
+                {{ booking.get_status_display }}
+            </div>
+        </div>
+
+        <div class="billing-grid">
+            <div>
+                <p class="info-label">Customer Details</p>
+                <p class="info-value">{{ booking.user.name }}</p>
+                <p style="color: rgba(255,255,255,0.5); font-size: 0.9rem;">{{ booking.user.email }}</p>
+                <p style="color: rgba(255,255,255,0.5); font-size: 0.9rem;">{{ booking.user.phone }}</p>
+            </div>
+            <div style="text-align: right;">
+                <p class="info-label">Booking Reference</p>
+                <p class="info-value">#MMT-{{ booking.id }}</p>
+                <p style="color: rgba(255,255,255,0.5); font-size: 0.9rem;">Order Date: {{ booking.created_at|date:"d M, Y" }}</p>
+                <p style="color: rgba(255,255,255,0.5); font-size: 0.9rem;">Payment Mode: Digital / Razorpay</p>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 3rem;">
+            <p class="info-label">Destination & Schedule</p>
+            <p class="info-value" style="font-size: 1.8rem; color: var(--primary);">{{ booking.trip.destination }}</p>
+            <p style="font-weight: 800; font-size: 1rem; margin-top: 0.5rem;">
+                <i class="far fa-calendar-alt"></i> Journey Starts: {{ booking.trip.start_date|date:"D, d M Y"|default:"TBD" }}
+            </p>
+        </div>
+
+        <table class="price-table">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Travelers</th>
+                    <th style="text-align: right;">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <p style="font-weight: 800; margin: 0;">Base Reservation Package</p>
+                        <p style="font-size: 0.75rem; color: rgba(255,255,255,0.5);">{{ booking.trip.duration }} Premium Experience</p>
+                    </td>
+                    <td>{{ booking.seats_booked }} Persons</td>
+                    <td style="text-align: right; font-weight: 800;">₹{{ booking.total_price }}</td>
+                </tr>
+                <tr class="total-row">
+                    <td colspan="2">Total Paid Amount</td>
+                    <td style="text-align: right;">₹{{ booking.total_price }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="background: rgba(255,255,255,0.02); padding: 2rem; border-radius: 1rem;">
+            <p class="info-label">Travel Instructions</p>
+            <ul style="font-size: 0.85rem; color: rgba(255,255,255,0.6); line-height: 1.6;">
+                <li>Please carry a valid ID proof for all travelers mentioned above.</li>
+                <li>Reach the departure point 30 minutes before the scheduled time.</li>
+                <li>Voucher is valid only for the specified date and destination.</li>
+                <li>Cancellation within 48 hours is subject to refund policy terms.</li>
+            </ul>
+        </div>
+
+        <div class="footer-note">
+            <p style="font-weight: 900; color: white; margin-bottom: 0.5rem;">Thank you for choosing MakeMyTrip</p>
+            <p>This is a computer-generated digital receipt and does not require a physical signature.</p>
+            <p>© 2026 MakeMyTrip Global. All Rights Reserved.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

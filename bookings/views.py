@@ -144,11 +144,7 @@ def initiate_payment_api(request):
             })
         except Exception as e:
             error_msg = str(e)
-            # If keys are missing or invalid, allow the frontend to fallback to Demo Mode
-            if "key_id" in error_msg.lower() or not settings.RAZORPAY_KEY_ID or "razorpay" in error_msg.lower():
-                return JsonResponse({
-                    'status': 'demo_available',
-                    'message': 'Switching to secure project presentation mode.'
-                })
+            if "key_id" in error_msg.lower() or not settings.RAZORPAY_KEY_ID:
+                error_msg = "Razorpay Keys are missing in Environment Variables. Please set RAZORPAY_KEY_ID."
             return JsonResponse({'status': 'error', 'message': error_msg}, status=500)
     return JsonResponse({'status': 'error'}, status=400)

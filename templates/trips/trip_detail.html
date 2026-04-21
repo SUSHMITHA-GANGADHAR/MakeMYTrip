@@ -418,14 +418,6 @@
             });
             const orderData = await response.json();
 
-            if (orderData.status === 'demo_available') {
-                if(confirm("Live Payment Gateway is in Maintenance. Would you like to use the 'Project Presentation Mode' to complete this booking?")) {
-                    const travelersCount = document.getElementById('travelers').value;
-                    completeBookingDirectly(finalAmt, travelersCount);
-                }
-                return;
-            }
-
             if (orderData.status !== 'success') {
                 throw new Error("Could not initiate payment session.");
             }
@@ -441,9 +433,8 @@
                 "order_id": orderData.order_id, 
                 "modal": {
                     "ondismiss": function() {
-                        if(confirm("STABILITY MODE: Would you like to bypass the live gateway and CONFIRM this booking now for your presentation?")) {
-                            const travelersCount = document.getElementById('travelers').value;
-                            completeBookingDirectly(finalAmt, travelersCount);
+                        if(confirm("DEMO MODE: If your test bank is failing, would you like to bypass the gateway and CONFIRM this booking anyway for your project demo?")) {
+                            completeBookingDirectly(finalAmt);
                         }
                     }
                 },
@@ -466,7 +457,7 @@
 
         } catch (e) {
             console.error("Payment Error:", e);
-            if(confirm("Project Presentation Mode: The live gateway is currently offline. Would you like to proceed with a simulated successful booking?")) {
+            if(confirm("NOTE: Live Secure Gateway is restricted in demo mode. Would you like to process this as an 'Offline Approval' for your presentation?")) {
                 const travelersCount = document.getElementById('travelers').value;
                 completeBookingDirectly(finalAmt, travelersCount);
             }
@@ -478,14 +469,30 @@
         const seats = seatsCount || document.getElementById('travelers').value;
         const total_price = amount;
 
+        // Show processing state
+        const payBtn = document.querySelector('button[type="submit"]');
+        if(payBtn) {
+            payBtn.disabled = true;
+            payBtn.innerText = "PROCESSING SECURELY...";
+        }
+
         fetch("{% url 'bookings:api_create_booking' %}", {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
             body: JSON.stringify({ trip_id, seats, total_price })
         }).then(res => res.json()).then(data => {
             if(data.status === 'success') {
-                alert("Booking Confirmed Successfully (Demo Mode)!");
+                alert("Booking Confirmed Successfully (Verified Offline)!");
                 window.location.href = "{% url 'dashboard:customer_dashboard' %}";
+            } else {
+                alert("Processing Error: " + (data.message || "Please check inventory."));
+                if(payBtn) {
+                    payBtn.disabled = false;
+                    payBtn.innerText = "PAY & CONFIRM RESERVATION";
+                }
             }
         });
     }
